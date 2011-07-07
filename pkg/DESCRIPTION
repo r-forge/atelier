@@ -9,4 +9,4 @@ Maintainer: Yvonnick Noel, University of Brittany, France <yvonnick.noel@univ-re
 Description: A series of statistical simulation and computation tools with a GTK GUI to understand statistical concepts and compute probabilities: Central-Limit Theorem and the Normal Distribution, Distribution of a mean, of a variance, a probability calculator from common distributions, bayesian tests on proportions and means.
 License: GPL (>=2)
 LazyLoad: no
-Depends: proto, cairoDevice, gWidgetsRGtk2
+Depends: proto, cairoDevice, gWidgetsRGtk2, partitions
