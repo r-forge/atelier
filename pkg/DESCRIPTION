@@ -1,0 +1,12 @@
+Package: AtelieR
+Type: Package
+Title: A GTK GUI for various simulation and computation tools in elementary statistics
+Version: 0.2
+Encoding: UTF-8
+Date: 2011-05-12
+Author: Yvonnick Noel
+Maintainer: Yvonnick Noel, University of Brittany, France <yvonnick.noel@univ-rennes2.fr>
+Description: A series of statistical simulation and computation tools with a GTK GUI to understand statistical concepts and compute probabilities: Central-Limit Theorem and the Normal Distribution, Distribution of a mean, of a variance, a probability calculator from common distributions, bayesian tests on proportions and means.
+License: GPL (>=2)
+LazyLoad: no
+Depends: proto, cairoDevice, gWidgetsRGtk2

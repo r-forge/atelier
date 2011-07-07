@@ -1,0 +1,254 @@
+#-----------------------------------------------------------------------------------------
+#                  Inférence bayésienne sur plusieurs proportions
+#-----------------------------------------------------------------------------------------
+library(partitions)
+
+.ws9 = proto(
+
+  create = function(.,h,...) {
+
+    # Don't create if no main interface exists
+    if(inherits(try(is.environment(.ws)),"try-error")) return()
+    
+    # Don't create if already opened
+    if("Inférence bayésienne\nsur plusieurs proportions" %in% names(.ws$nb)) return()
+    
+   .$betaparam1 = gedit("1",width=15,coerce.with=as.numeric,handler=.$updatePlot)
+   .$betaparam2 = gedit("1",width=15,coerce.with=as.numeric,handler=.$updatePlot)
+    enabled(.$betaparam1) = FALSE
+    enabled(.$betaparam2) = FALSE
+
+    add(.ws$nb,group <- ggroup(horizontal=FALSE),label="Inférence bayésienne\nsur plusieurs proportions")
+    add(group,tmp <- gframe("Loi Beta a priori",horizontal=FALSE))
+    priorGroup = glayout(container=tmp)
+    priorGroup[2,2,anchor=c(-1,0)]=glabel("a=")
+    priorGroup[2,3,anchor=c(-1,0)]=.$betaparam1
+    priorGroup[3,2,anchor=c(-1,0),anchor=c(-1,0)]=glabel("b=")
+    priorGroup[3,3,anchor=c(-1,0)]=.$betaparam2
+    priorGroup[4,1]=""
+    visible(priorGroup)=TRUE
+
+   .$success = gedit("",width=20,handler=.$updatePlot)
+   .$Ntot = gedit("",width=20,handler=.$updatePlot)
+
+    add(group,tmp <- gframe("Données observées"))
+    dataGroup = glayout(container=tmp)
+    dataGroup[2,2,anchor=c(-1,0)]=glabel("Succès")
+    dataGroup[2,3]=.$success
+    dataGroup[3,2,anchor=c(-1,0)]=glabel("Totaux")
+    dataGroup[3,3]=.$Ntot
+    dataGroup[4,1]=""
+    visible(dataGroup)=TRUE
+
+   .$priorprob = gedit("",width=5,handler=.$updatePlot)
+   .$model = gedit("",width=15,handler=.$updatePlot)
+   .$bf = glabel("")
+   .$possible = glabel("")
+   .$postprob = glabel("")
+   .$testAll = gcheckbox("Tout tester",checked=FALSE,handler=.$onTestAll)
+   .$bestOne = glabel("")
+
+    add(group,tmp <- gframe("Test d\'hypothèse"))
+    testGroup = glayout(container=tmp)
+    testGroup[2,2,anchor=c(-1,0)] = glabel("Modèles possibles")
+    testGroup[2,3] = .$possible
+    testGroup[3,2,anchor=c(-1,0)] = glabel("Modèle cible")
+    testGroup[3,3] = .$model
+    testGroup[4,2,anchor=c(-1,0)] = glabel("Pr(M) a priori")
+    testGroup[4,3] =.$priorprob
+    testGroup[5,3] =.$testAll
+    testGroup[6,2] = glabel("Meilleur modèle")
+    testGroup[6,3] =.$bestOne
+    testGroup[7,2] = glabel("Facteur de Bayes")
+    testGroup[7,3] =.$bf
+    testGroup[8,2] = glabel("Pr(M|D)")
+    testGroup[8,3] =.$postprob
+    testGroup[9,1] = ""
+    visible(testGroup)=TRUE
+
+    add(group, tmp <- gframe("Estimations a posteriori des modèles"),expand=TRUE)
+    add(tmp,.$postestim <- gtable(cbind(Groupe=rep("",10),Saturé=rep("",10),Cible=rep("",10),Moyennés=rep("",10))),expand=TRUE)
+
+    buttonGroup=ggroup(container=group)
+    addSpring(buttonGroup)
+    gbutton("  Calculer  ",container=buttonGroup, handler=.$updatePlot)
+  
+  },
+  onTestAll = function(.,h,...) {
+  
+    if(svalue(.$testAll)) enabled(.$model) = FALSE
+    else                  enabled(.$model) = TRUE
+    svalue(.$model) = ""
+    
+  },
+  updatePlot = function(.,h,...) {
+
+    # Vérification des paramètres
+    if(any(is.na(c(svalue(.$betaparam1),svalue(.$betaparam2))))) {
+      gmessage("Spécifiez des valeurs de paramètres pour la loi Beta a priori.")
+      return()
+    }
+    
+    # Vérification des données
+    if(any(is.na(c(svalue(.$success),svalue(.$Ntot))))) {
+      gmessage("Indiquez des valeurs observées.")
+      return()
+    }
+    
+    a = svalue(.$betaparam1)
+    b = svalue(.$betaparam2)
+    s = unlist(strsplit(svalue(.$success)," "))
+    s = as.numeric(s[s != ""])
+    N = unlist(strsplit(svalue(.$Ntot)," "))
+    N = as.numeric(N[N != ""])
+    f = N - s
+
+    if( (length(s)<2) || (length(f)<2) || (length(s) != length(f)) ) {
+      gmessage("Spécifiez au moins deux nombres de succès et d'échecs.\nVérifiez qu'il y a autant de valeurs dans les champs 1 et 2")
+      return()
+    }
+    K = length(s)
+
+    # Vérification du modèle
+    if(!nchar(svalue(.$model))) {
+      svalue(.$model) = paste(1:length(s),collapse=" ")
+      # Return or the analysis is performed twice!
+      return()
+    }
+    m = .$getModel()
+    if(length(m) != K) {
+      gmessage("Nombre de groupes incorrect dans la définition du modèle.")
+      return()
+    }
+    
+   .ws$setStatus("Analyse en cours...")
+    svalue(.$bestOne) = ""
+
+    if(K==2) models = cbind(c(1,1),c(1,2))
+    else     models = setparts(K)
+    nmodels = ncol(models)
+    svalue(.$possible) = paste(nmodels)
+
+    # Bayesian test
+    priorprob = eval(parse(text=svalue(.$priorprob)))
+    if(is.null(priorprob)) {
+      svalue(.$priorprob) = paste("1/",nmodels,sep="")
+      # Return or the analysis is performed twice!
+      return()
+    }
+
+    p0 = (sum(s)+1)/(sum(s+f)+2)
+
+    if(svalue(.$testAll)) {
+    
+      # All possible models
+      results = matrix(0,0,K+1)
+      group.names=paste(1:K)
+      for(i in 1:ncol(models)) {
+        test = .$testModel(s,f,models[,i])
+        est = (test$s+1)/(test$s+test$f+2)
+        results = rbind(results,c(est,test$bf))
+        model.name = tapply(group.names,models[,i],paste,collapse=",")
+        model.name = paste(sapply(model.name,function(x) paste("(",x,")",sep="")),collapse=",")
+        rownames(results)[i] = model.name
+      }
+      results = cbind(results,results[,K+1]/sum(results[,K+1]))
+      colnames(results) = c(paste("G",1:K,sep=""),"BF","Prob")
+      
+      # Best model
+      best.one = which.max(results[,"Prob"])
+      svalue(.$bestOne) = rownames(results)[best.one]
+      best.bf = results[best.one,"BF"]
+      post.prob = priorprob * best.bf/(priorprob * best.bf + 1 - priorprob)
+      best.estim = results[best.one,1:K]
+      svalue(.$bf) = round(best.bf,4)
+      svalue(.$postprob) = round(post.prob,4)
+
+      # A posteriori model averaged estimations (Viana, 1991)
+      psat = (s+1)/(s+f+2)
+      post.estim = colSums(results[,"Prob"]*results[,1:K])
+
+     .$postestim[,] = matrix("",10,4)
+     .$postestim[1:K,1] = paste(1:K)
+     .$postestim[1:K,2] = round(psat,4)
+     .$postestim[1:K,3] = round(best.estim,4)
+     .$postestim[1:K,4] = round(post.estim,4)
+    }
+    else {
+      test = .$testModel(s,f,m)
+      post.prob = priorprob * test$bf/(priorprob * test$bf + 1 - priorprob)
+      
+      svalue(.$bf) = paste(round(test$bf,4))
+      svalue(.$postprob) = paste(round(post.prob,4))
+
+      # A posteriori model averaged estimations (Viana, 1991)
+      psat = (s+1)/(s+f+2)
+      p1 = (test$s+1)/(test$s+test$f+2)
+      post.estim = post.prob*p1 + (1-post.prob)*p0
+
+     .$postestim[,] = matrix("",10,4)
+     .$postestim[1:K,1] = paste(1:K)
+     .$postestim[1:K,2] = round(psat,4)
+     .$postestim[1:K,3] = round(p1,4)
+     .$postestim[1:K,4] = round(post.estim,4)
+    }
+    
+    # Graphique
+    stats = .$postestim[1:K,]
+    plot(stats$Groupe,stats$Saturé,xlab="Groupes",ylab="Probabilités estimées",ylim=c(0,1),main="",type="n",xaxt="n")
+    axis(1,1:K,paste(1:K))
+    abline(h=p0,col="lightgrey",lty=2,lwd=2)
+    points(stats$Groupe,stats$Saturé,cex=1.3)
+    for(k in 1:K) lines(rbind(c(k,qbeta(.025,s[k]+a,f[k]+b)),c(k,qbeta(.975,s[k]+a,f[k]+b))))
+    points(stats$Groupe,stats$Cible,pch=19,col="red")
+    points(stats$Groupe,stats$Moyennés,pch=19,col="blue")
+    legend("topleft",pch=c(1,19,19),col=c("black","red","blue"),legend=c("Saturé","Cible","Moyenné"),inset=.01)
+    
+   .ws$setStatus("Prêt.")
+  },
+  getModel = function(.) {
+  
+    m = unlist(strsplit(svalue(.$model)," "))
+    m[m != ""]
+  },
+  testModel = function(.,s0,f0,mod) {
+  
+    # Test
+    s = tapply(s0,mod,sum)
+    f = tapply(f0,mod,sum)
+    bf = .$BF10(s,s+f)
+    
+    # Counts
+    s = s[mod]
+    f = f[mod]
+
+    list(bf=bf,s=s,f=f)
+  },
+  # Facteur de Bayes
+  BF10 = function(.,k,n) {
+
+    N = sum(n)
+    K = sum(k)
+      
+    log.bf10 = log(N+1) + lchoose(N,K) - sum(lchoose(n,k)) - sum(log(n+1))
+    exp(log.bf10)
+  },
+
+  #---------------------------------------------------------------------------------------
+  #  SLOT                   INITIAL VALUE                                    CONTENT
+  #---------------------------------------------------------------------------------------
+  betaparam1   =  NULL,                #
+  betaparam2   =  NULL,                #
+  success      =  NULL,                #
+  Ntot         =  NULL,                #
+  priorprob    =  NULL,                #
+  model        =  NULL,                #
+  possible     =  NULL,                #
+  testAll      =  NULL,                #
+  bestOne      =  NULL,                #
+  bf           =  NULL,                #
+  postprob     =  NULL,                #
+  postestim    =  NULL                 #
+)
+
+
