@@ -108,7 +108,7 @@
     }
 
     if(!(svalue(.$sdFixed)) && is.na(svalue(.$s))) {
-      gmessage("Entrez la variance observée.")
+      gmessage("Entrez l'écart-type des données (connu ou estimé).")
       return()
     }
 

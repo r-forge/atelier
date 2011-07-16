@@ -40,8 +40,8 @@ library(gWidgets)
      tmp$Ateliers$Calculer$"Inférence bayésienne sur une proportion"$handler       = .ws6$create
      tmp$Ateliers$Calculer$"Inférence bayésienne sur plusieurs proportions"$handler = .ws9$create
      tmp$Ateliers$Calculer$"Inférence bayésienne sur table de contingence"$handler = .ws10$create
-     tmp$Ateliers$Calculer$"Inférence bayésienne sur une moyenne (a priori non informative)"$handler = .ws7$create
-     tmp$Ateliers$Calculer$"Inférence bayésienne sur une moyenne (a priori informative)"$handler = .ws8$create
+     tmp$Ateliers$Calculer$"Inférence bayésienne sur une moyenne"$handler          = .ws8$create
+     tmp$Ateliers$Calculer$"Inférence bayésienne sur une variance"$handler         = .ws11$create
     .$menu = gmenu(tmp,cont=window)
 
    },

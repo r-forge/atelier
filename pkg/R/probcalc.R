@@ -85,7 +85,7 @@
       return()
     }
 
-    if( (distrib %in% c("Binomiale","Poisson","Chi-2","Fisher","Gamma","Beta"))  && (value < 0))  {
+    if( (distrib %in% c("Binomiale","Poisson","Chi-2","Chi-2 inverse","Fisher","Gamma","Beta"))  && (value < 0))  {
       gmessage("Cette distribution n\'est pas définie pour les valeurs négatives.")
       return()  
     }
@@ -103,6 +103,16 @@
       return()
     }
     
+    dinvgamma = function(z,a,b) exp(a*log(b) - lgamma(a) -(a+1)*log(z) -(b/z))
+    qinvgamma = function(p,a,b) ifelse(((1 - p) <= .Machine$double.eps),Inf,1/qgamma(1-p,a,b))
+    pinvgamma = function(z,a,b) 1-pgamma(1/z,a,b)
+    rinvgamma = function(n,a,b) 1/rgamma(n=n,shape=a,rate=b)
+    
+    dscaledInvChi2 = function(z,nu,s2) dinvgamma(z,nu/2,nu*s2/2)
+    pscaledInvChi2 = function(p,nu,s2) pinvgamma(p,nu/2,nu*s2/2)
+    qscaledInvChi2 = function(z,nu,s2) qinvgamma(z,nu/2,nu*s2/2)
+    rscaledInvChi2 = function(n,nu,s2) rinvgamma(n,nu/2,nu*s2/2)
+
     dfunction = eval(parse(text=paste("d",probf[distrib],sep="")))
     pfunction = eval(parse(text=paste("p",probf[distrib],sep="")))
     qfunction = eval(parse(text=paste("q",probf[distrib],sep="")))
@@ -218,11 +228,10 @@
       # Continuous distribution
       if(!isDiscrete) { 
         from = ifelse(distrib=="Normale",param1-4*param2,0)
-        from = min(from,value)
-        to = ifelse(distrib=="Normale",param1+4*param2,max(rfunction(1000,param1,param2)))
-        to = max(to,value)
+        from = min(from,value,na.rm=TRUE)
+        to = ifelse(distrib=="Normale",param1+4*param2,max(rfunction(1000,param1,param2),na.rm=TRUE))
+        to = max(to,value,na.rm=TRUE)
         curve(dfunction(x,param1,param2),n=1000,from=from,to=to,lwd=2,main=title,xlab=xlab,ylab=ylab)
-        
         if(!right) {
           z = c(seq(from,value,len=1000),value,from)
           dz = c(dfunction(z[1:1000],param1,param2),0,0)
@@ -261,9 +270,9 @@
       if(!isDiscrete) {
       
         from = ifelse(distrib=="Student",min(rfunction(1000,param1)),0)
-        from = min(from,value)
-        to = max(rfunction(1000,param1))
-        to = max(to,value)
+        from = min(from,value,na.rm=TRUE)
+        to = max(rfunction(1000,param1),na.rm=TRUE)
+        to = max(to,value,na.rm=TRUE)
         curve(dfunction(x,param1),n=1000,from=from,to=to,lwd=2,main=title,xlab=xlab,ylab=ylab)
         
         if(!right) {
@@ -281,7 +290,7 @@
       # Discrete distribution
       else {
         from = 0
-        to = max(rfunction(1000,param1))
+        to = max(rfunction(1000,param1),na.rm=TRUE)
         z = 0:to
         plot(z,dfunction(z,param1),type="h",lwd=2,main=title,xlab=xlab,ylab=ylab)
         
@@ -329,17 +338,20 @@
   #  SLOT                   INITIAL VALUE                          CONTENT
   #---------------------------------------------------------------------------------------
   availDists   = c(Normale="norm",Student="t",
-                  "Chi-2"="chisq",Fisher="f",
-                   Binomiale="binom",Poisson="pois",
-                   Gamma="gamma",Beta="beta"),       #     Distributions disponibles
+                  "Chi-2"="chisq","Chi-2 inverse"="scaledInvChi2",
+                   Fisher="f",Binomiale="binom",Poisson="pois",
+                   Gamma="gamma","Gamma inverse"="invgamma",
+                   Beta="beta"),       #     Distributions disponibles
   paramNames   = list(Uniforme=c("Borne gauche","Borne droite"),
-                      Binomiale=c("Taille","Probabilité"),
+                      Binomiale=c("Effectif","Probabilité"),
                       Normale=c("Moyenne","Ecart-type"),
                       Gamma=c("Forme","Echelle"),
+                     "Gamma inverse"=c("Forme","Echelle"),
+                     "Chi-2 inverse"=c("ddl","Echelle"),
                       Beta=c("alpha","beta"),
                       Poisson=c("Moyenne","-"),
-                      Student=c("DDL","-"),
-                      "Chi-2"=c("DDL","-")),         #    Noms des paramètres de lois
+                      Student=c("ddl","-"),
+                      "Chi-2"=c("ddl","-")),         #    Noms des paramètres de lois
   distribution = NULL,                               #    Distribution choisie
   calcWhat     = NULL,                               #    Type de calcul (de quantile à prob. ou l'inverse)
   side         = NULL,                               #    Cumul à droite ou à gauche
