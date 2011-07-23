@@ -16,7 +16,7 @@
    .$priorn      = gedit("2",width=15,coerce.with=as.numeric,handler=.$updatePlot)
 
     add(.ws$nb,group <- ggroup(horizontal=FALSE),label="Inférence bayésienne\nsur une moyenne")
-    tmp = gframe("Loi normale a priori", horizontal=FALSE,container = group,expand=TRUE)
+    tmp = gframe("Loi normale a priori sur µ", horizontal=FALSE,container = group,expand=TRUE)
     priorGroup = glayout(container=tmp)
     priorGroup[2,2,anchor=c(-1,0)]=glabel("Effectif")
     priorGroup[2,3]=.$priorn
