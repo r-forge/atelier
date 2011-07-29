@@ -80,11 +80,8 @@
     distrib = svalue(.$distribution)
     is1P = distrib %in% c("Student","Chi-2","Poisson")
     is2P = distrib %in% c("Normale","Chi-2 inverse","Fisher","Binomiale","Gamma","Gamma inverse","Beta")
-    is3P = distrib %in% c("Student non standard","Lambda prime")
+    is3P = distrib %in% c("Student non standard","Student non centrale","Chi-2 non centrale","Fisher non centrale","Lambda prime")
     
-    # Correction: Different behavior of dt and dchisq when ncp is missing or set to zero
-    if( (distrib %in% c("Student","Chi-2")) && (param2 !=0) && !is.null(param2) ) is1P = FALSE
-
     if(is2P && is.null(param2)) {
         gmessage("Il manque des valeurs de paramètres.")
         return()
@@ -122,6 +119,18 @@
     
     # Some extra distributions for Bayesian stats
     
+    # Non-central Chi-square
+    dncchisq = function(x,nu,ncp) dchisq(x,nu,ncp)
+    qncchisq = function(p,nu,ncp) qchisq(p,nu,ncp)
+    pncchisq = function(q,nu,ncp) pchisq(q,nu,ncp)
+    rncchisq = function(n,nu,ncp) rchisq(n,nu,ncp)
+
+    # Non-central F
+    dncf = function(x,nu1,nu2,ncp) df(x,nu1,nu2,ncp)
+    qncf = function(p,nu1,nu2,ncp) qf(p,nu1,nu2,ncp)
+    pncf = function(q,nu1,nu2,ncp) pf(q,nu1,nu2,ncp)
+    rncf = function(n,nu1,nu2,ncp) rf(n,nu1,nu2,ncp)
+    
     # Inverse Gamma
     dinvgamma = function(z,a,b) exp(a*log(b) - lgamma(a) -(a+1)*log(z) -(b/z))
     qinvgamma = function(p,a,b) ifelse(((1 - p) <= .Machine$double.eps),Inf,1/qgamma(1-p,a,b))
@@ -140,29 +149,36 @@
     pnst = function(q,nu,pos,scale) pt((q-pos)/scale,nu)
     rnst = function(n,nu,pos,scale) rt(n,nu)*scale + pos
     
+    # Non central scaled Student
+    dnct = function(x,nu,ncp,scale) dt(x/scale,nu,ncp/scale)/scale
+    qnct = function(p,nu,ncp,scale) qt(p,nu,ncp/scale)*scale
+    pnct = function(q,nu,ncp,scale) pt(q/scale,nu,ncp/scale)
+    rnct = function(n,nu,ncp,scale) rt(n,nu,ncp/scale)*scale
+    
     # Lambda-prime distribution (Lecoutre, 1999)
+    rlambdaprime = function(n,nu,ncp,scale) rnorm(n,0,scale) + ncp*sqrt(rchisq(n,nu)/nu)
     plambdaprime = function(x,nu,ncp,scale) 1-pt(ncp/scale,nu,x/scale)
     qlambdaprime = function(p,nu,ncp,scale) {
 
-      # Approximation Chi-2 (Lecoutre, 2007)
       t = ncp/scale
       k = exp( ((log(2)-log(nu))/2) + lgamma((nu+1)/2) - lgamma(nu/2) )
       M = k*t
       V = 1 + t**2 - M**2
-      W = 2*(k**2) - ((2*nu)-1)*k*(t**3)/nu
-      Sk = W/(V**(3/2))
 
-      if(Sk<0.001) return(scale*qnorm(p,M,sqrt(V)))
+      N = 100
+      from = M - 4.5*sqrt(V)
+      to   = M + 4.5*sqrt(V)
 
-      c = W/(4*V)
-      q = V/(2*(c**2))
-      a = M-q*c
-
-      if(c>0) return(scale*(a+c*qchisq(p,nu)))
-      else    return(scale(a+c*qchisq(1-p,nu)))
+      for(iter in 1:3) {
       
+        range = seq(from,to,len=N)
+        index = which.min(abs(p - plambdaprime(range,nu,ncp,scale)))
+        from = range[index-1]
+        to = range[index+1]
+      }
+      
+      range[index]
     }
-    rlambdaprime = function(n,nu,ncp,scale) rnorm(n,0,scale) + ncp*sqrt(rchisq(n,nu)/nu)
     dlambdaprime = function(x,nu,ncp,scale) {
     
       # Numerical derivatives
@@ -457,8 +473,8 @@
     param2 = eval(parse(text=svalue(.$param2)))
     
     is1P = distrib %in% c("Student","Chi-2","Poisson")
-    is2P = distrib %in% c("Normale","Chi-2 inverse","Fisher","Binomiale","Gamma","Gamma inverse","Beta")
-    is3P = distrib %in% c("Student non standard","Lambda prime")
+    is2P = distrib %in% c("Normale","Uniforme","Chi-2 inverse","Chi-2 non centrale","Fisher","Binomiale","Gamma","Gamma inverse","Beta")
+    is3P = distrib %in% c("Student non standard","Lambda prime","Student non centrale","Fisher non centrale")
     
     # Warning: a droplist may be temporarily set to NULL in gWidgets when changed
     if(is.null(distrib)) return()
@@ -495,23 +511,28 @@
   #---------------------------------------------------------------------------------------
   #  SLOT                   INITIAL VALUE                          CONTENT
   #---------------------------------------------------------------------------------------
-  availDists   = c(Normale="norm",Student="t","Student non standard"="nst",  #     Distributions disponibles
-                  "Chi-2"="chisq","Chi-2 inverse"="scaledInvChi2",
-                   Fisher="f",Binomiale="binom",Poisson="pois",
+  availDists   = c(Normale="norm",Uniforme="unif",Binomiale="binom",Poisson="pois",                                  #     Distributions disponibles
+                   Student="t","Student non standard"="nst","Student non centrale"="nct",
+                  "Chi-2"="chisq","Chi-2 inverse"="scaledInvChi2","Chi-2 non centrale"="ncchisq",
+                   Fisher="f","Fisher non centrale"="ncf",
                    Gamma="gamma","Gamma inverse"="invgamma",
                    Beta="beta","Lambda prime"="lambdaprime"),       
-  paramNames   = list(Uniforme=c("Borne gauche","Borne droite"," "),          #    Noms des paramètres de lois
-                      Binomiale=c("Effectif","Probabilité"," "),
-                      Normale=c("Moyenne","Ecart-type"," "),
-                      Gamma=c("Forme","Echelle",""),
-                     "Gamma inverse"=c("Forme","Echelle"," "),
-                     "Chi-2 inverse"=c("ddl","Echelle"," "),
-                      Beta=c("alpha","beta"," "),
-                      Poisson=c("Moyenne"," "," "),
-                      Student=c("ddl","Non-central."," "),
-                      "Student non standard"=c("ddl","Centre","Echelle"),
-                      "Chi-2"=c("ddl","Non-central."," "),
-                      "Lambda prime"=c("ddl","Non-central.","Echelle")),
+  paramNames   = list(Uniforme              = c("Borne gauche","Borne droite  ","       "),          #    Noms des paramètres de lois
+                      Binomiale             = c("Effectif    ","Probabilité   ","       "),
+                      Normale               = c("Moyenne     ","Ecart-type    ","       "),
+                      Gamma                 = c("Forme       ","Echelle       ","       "),
+                     "Gamma inverse"        = c("Forme       ","Echelle       ","       "),
+                     "Chi-2"                = c("ddl         ","              ","       "),
+                     "Chi-2 inverse"        = c("ddl         ","Echelle       ","       "),
+                     "Chi-2 non centrale"   = c("ddl         ","Non centralité","       "),
+                      Beta                  = c("alpha       ","beta          ","       "),
+                      Poisson               = c("Moyenne     ","              ","       "),
+                      Student               = c("ddl         ","              ","       "),
+                     "Student non standard" = c("ddl         ","Centre        ","Echelle"),
+                     "Student non centrale" = c("ddl         ","Non-centralité","Echelle"),
+                     "Fisher"               = c("ddl1        ","ddl2          ","       "),
+                     "Fisher non centrale"  = c("ddl1        ","ddl2          ","Non centralité"),
+                     "Lambda prime"         = c("ddl         ","Non-centralité","Echelle")),
   distribution = NULL,                                 #    Distribution choisie
   calcWhat     = NULL,                                 #    Type de calcul (de quantile à prob. ou l'inverse)
   side         = NULL,                                 #    Cumul à droite ou à gauche

@@ -32,16 +32,17 @@ library(gWidgets)
      tmp$Session$Quitter$icon = "quit"
 
      # Menu ateliers
-     tmp$Ateliers$Comprendre$"Construction de la loi normale"$handler              = .ws1$create
-     tmp$Ateliers$Comprendre$"Changement d\'origine et d\'échelle"$handler         = .ws2$create
-     tmp$Ateliers$Comprendre$"Distribution d'une moyenne d\'échantillon"$handler   = .ws3$create
-     tmp$Ateliers$Calculer$"Calculateur de probabilités"$handler                   = .ws4$create
-     tmp$Ateliers$Comprendre$"Distribution d\'une variance d\'échantillon"$handler = .ws5$create
-     tmp$Ateliers$Calculer$"Inférence bayésienne sur une proportion"$handler       = .ws6$create
+     tmp$Ateliers$Comprendre$"Construction de la loi normale"$handler               = .ws1$create
+     tmp$Ateliers$Comprendre$"Changement d\'origine et d\'échelle"$handler          = .ws2$create
+     tmp$Ateliers$Comprendre$"Distribution d'une moyenne d\'échantillon"$handler    = .ws3$create
+     tmp$Ateliers$Calculer$"Calculateur de probabilités"$handler                    = .ws4$create
+     tmp$Ateliers$Comprendre$"Distribution d\'une variance d\'échantillon"$handler  = .ws5$create
+     tmp$Ateliers$Calculer$"Inférence bayésienne sur une proportion"$handler        = .ws6$create
      tmp$Ateliers$Calculer$"Inférence bayésienne sur plusieurs proportions"$handler = .ws9$create
-     tmp$Ateliers$Calculer$"Inférence bayésienne sur table de contingence"$handler = .ws10$create
-     tmp$Ateliers$Calculer$"Inférence bayésienne sur une moyenne"$handler          = .ws8$create
-     tmp$Ateliers$Calculer$"Inférence bayésienne sur une variance"$handler         = .ws11$create
+     tmp$Ateliers$Calculer$"Inférence bayésienne sur table de contingence"$handler  = .ws10$create
+     tmp$Ateliers$Calculer$"Inférence bayésienne sur une variance"$handler          = .ws11$create
+     tmp$Ateliers$Calculer$"Inférence bayésienne sur une moyenne"$handler           = .ws8$create
+     tmp$Ateliers$Calculer$"Inférence bayésienne sur plusieurs moyennes"$handler    = .ws13$create
     .$menu = gmenu(tmp,cont=window)
 
    },
