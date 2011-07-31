@@ -15,9 +15,9 @@ library(partitions)
     
     add(.ws$nb,group <- ggroup(horizontal=FALSE),label="Inférence bayésienne\nsur plusieurs moyennes")
 
-   .$means = gedit("9.8 10.8 15.4 17.6 21.6",width=25,handler=.$updatePlot)
-   .$sds   = gedit("3.35 2.86 3.13 2.07 2.61",width=25,handler=.$updatePlot)
-   .$Ntot  = gedit("5 5 5 5 5",width=25,handler=.$updatePlot)
+   .$means = gedit("10  4 29 24 11",width=25,handler=.$updatePlot)
+   .$sds   = gedit("5.126960 3.162278 6.164414 6.369571 6.718843",width=25,handler=.$updatePlot)
+   .$Ntot  = gedit("8 8 8 8 8",width=25,handler=.$updatePlot)
 
     add(group,tmp <- gframe("Données observées"))
     dataGroup = glayout(container=tmp)
@@ -37,6 +37,7 @@ library(partitions)
    .$postprob = glabel("")
    .$testAll = gcheckbox("Tout tester",checked=FALSE,handler=.$onTestAll)
    .$bestOne = glabel("")
+   .$doBMA = gcheckbox("Moyenner",handler=.$updatePlot)
 
     add(group,tmp <- gframe("Test d\'hypothèse"))
     testGroup = glayout(container=tmp)
@@ -46,10 +47,11 @@ library(partitions)
     testGroup[3,3] = .$model
     testGroup[4,2,anchor=c(-1,0)] = glabel("Pr(M) a priori")
     testGroup[4,3] =.$priorprob
-    testGroup[5,3] =.$testAll
+    testGroup[5,2] =.$testAll
+    testGroup[5,3] =.$doBMA
     testGroup[6,2] = glabel("Meilleur modèle")
     testGroup[6,3] =.$bestOne
-    testGroup[7,2] = glabel("Facteur de Bayes")
+    testGroup[7,2] = glabel("BIC")
     testGroup[7,3] =.$bf
     testGroup[8,2] = glabel("Pr(M|D)")
     testGroup[8,3] =.$postprob
@@ -57,7 +59,7 @@ library(partitions)
     visible(testGroup)=TRUE
 
     add(group, tmp <- gframe("Estimations a posteriori des modèles"),expand=TRUE)
-    add(tmp,.$postestim <- gtable(cbind(Groupe=rep("",10),Saturé=rep("",10),Cible=rep("",10),Moyenné=rep("",10))),expand=TRUE)
+    add(tmp,.$postestim <- gtable(cbind(Groupe=rep("",10),Moyennes=rep("",10),Inf95=rep("",10),Sup95=rep("",10))),expand=TRUE)
 
     buttonGroup = ggroup(container=group)
     addSpring(buttonGroup)
@@ -67,12 +69,18 @@ library(partitions)
   onTestAll = function(.,h,...) {
   
     if(svalue(.$testAll)) { enabled(.$model) = FALSE ; enabled(.$priorprob) = FALSE }
-    else                  { enabled(.$model) = TRUE  ; enabled(.$priorprob) = TRUE }
+    else                  { enabled(.$model) = TRUE  ; enabled(.$priorprob) = TRUE ; enabled(.$doBMA) = FALSE }
     svalue(.$model) = ""
     
   },
   updatePlot = function(.,h,...) {
 
+    if(svalue(.$doBMA) && !svalue(.$testAll)) {
+      svalue(.$testAll) = TRUE
+      # Return or the analysis is performed twice!
+      return()
+    }
+    
     # Vérification des données
     if(any(is.na(c(svalue(.$means),svalue(.$sds))))) {
       gmessage("Indiquez des valeurs observées.")
@@ -131,52 +139,61 @@ library(partitions)
 
     if(svalue(.$testAll)) {
     
-      # All possible models
-      results = matrix(0,0,K+1)
-      group.names=paste(1:K)
+      # Compute all possible models
+      results = matrix(0,0,3*K)
+      modProbs = vector()
       for(i in 1:ncol(models)) {
         test = .$testModel(mn,sd,N,models[,i])
-        results = rbind(results,c(test$means,test$prob))
-        model.name = tapply(group.names,models[,i],paste,collapse=",")
-        model.name = paste(sapply(model.name,function(x) paste("(",x,")",sep="")),collapse=",")
-        rownames(results)[i] = model.name
+        results = rbind(results,c(test$means,test$IC.inf,test$IC.sup))
+        modProbs = c(modProbs,test$prob)
+        rownames(results)[i] = test$name
       }
+      colnames(results) = c(paste("m",1:K,sep=""),paste("Inf",1:K,sep=""),paste("Sup",1:K,sep=""))
 
       # Compute approximate Bayes factors
-      results = cbind(results,results[,K+1]/m0$prob)
+      bfs = modProbs/m0$prob
       
       # Compute model posterior probs
-      results[,K+1] = results[,K+1]/sum(results[,K+1])
+      modProbs = modProbs/sum(modProbs)
       
-      colnames(results) = c(paste("G",1:K,sep=""),"Prob","BF")
-      print(results)
+      # Bayesian Model Averaging
+      if(svalue(.$doBMA)) {
       
-      # Best model
-      best.one = which.max(results[,"Prob"])
-      svalue(.$bestOne) = rownames(results)[best.one]
-      best.bf = results[best.one,"BF"]
-      post.prob = results[best.one,"Prob"]
-      target = list(means = results[best.one,1:K]) # for compatibility with the other case
-      svalue(.$bf) = round(best.bf,4)
-      svalue(.$postprob) = round(post.prob,4)
+        # A posteriori model averaged estimations (Neath & Cavanaugh, 2006)
+        post.estim = colSums(results*modProbs)
+        target = list(name="Averaged",means=post.estim[1:K],IC.inf=post.estim[(K+1):(2*K)],IC.sup=post.estim[(2*K+1):(3*K)])
+        svalue(.$bestOne) = "(Moyenné)"
+        svalue(.$bf) = ""
+        svalue(.$postprob) = ""
+      }
+      
+      # Best model selection
+      else {
 
-      # A posteriori model averaged estimations (Neath & Cavanaugh, 2006)
-      post.estim = colSums(results[,"Prob"]*results[,1:K])
+        best.one = which.max(modProbs)
+        target = .$testModel(mn,sd,N,models[,best.one])
+        svalue(.$bestOne) = target$name
+        svalue(.$bf) = round(target$bic,4)
+        svalue(.$postprob) = round(modProbs[best.one],4)
+      }
 
      .$postestim[,] = matrix("",10,4)
      .$postestim[1:K,1] = paste(1:K)
-     .$postestim[1:K,2] = round(mn,4)
-     .$postestim[1:K,3] = round(target$means,4)
-     .$postestim[1:K,4] = round(post.estim,4)
+     .$postestim[1:K,2] = round(target$means,4)
+     .$postestim[1:K,3] = round(target$IC.inf,4)
+     .$postestim[1:K,4] = round(target$IC.sup,4)
     }
+    
+    # Theoretical model
     else {
+    
       target = .$testModel(mn,sd,N,m)
 
       # Compute posterior prob
       target.bf = target$prob/m0$prob
       post.prob = priorprob * target.bf/(priorprob * target.bf + 1 - priorprob)
       
-      svalue(.$bf) = paste(round(target.bf,4))
+      svalue(.$bf) = paste(round(target$bic,4))
       svalue(.$postprob) = paste(round(post.prob,4))
 
       # A posteriori model averaged estimations (Stein, 1955)
@@ -184,9 +201,9 @@ library(partitions)
 
      .$postestim[,] = matrix("",10,4)
      .$postestim[1:K,1] = paste(1:K)
-     .$postestim[1:K,2] = round(mn,4)
-     .$postestim[1:K,3] = round(target$means,4)
-     .$postestim[1:K,4] = round(post.estim,4)
+     .$postestim[1:K,2] = round(target$means,4)
+     .$postestim[1:K,3] = round(target$IC.inf,4)
+     .$postestim[1:K,4] = round(target$IC.sup,4)
     }
     
     # Plot
@@ -195,11 +212,11 @@ library(partitions)
     plot(1:K,msat$means,xlab="Groupes",ylab="Moyennes estimées",main="",type="n",xaxt="n",ylim=c(ymin,ymax))
     axis(1,1:K,paste(1:K))
     abline(h=m0$means[1],col="lightgrey",lty=2,lwd=2)
+    
     points(1:K,msat$means,cex=1.5)
-    for(k in 1:K) lines(rbind(c(k,msat$IC.inf[k]),c(k,msat$IC.sup[k])))
-    points(1:K,target$means,pch=19,col="red",cex=1.2)
-    points(1:K,post.estim,pch=19,col="blue",cex=.9)
-    legend("topleft",pch=c(1,19,19),pt.cex=1.2,col=c("black","red","blue"),legend=c("Saturé","Cible","Moyenné"),inset=.01)
+    for(k in 1:K) lines(rbind(c(k,target$IC.inf[k]),c(k,target$IC.sup[k])),col="red")
+    points(1:K,target$means,pch=19,col="red")
+    legend("topleft",pch=c(1,19),pt.cex=1.2,col=c("black","red"),legend=c("Données","Modèle"),inset=.01)
     
    .ws$setStatus("Prêt.")
   },
@@ -225,16 +242,23 @@ library(partitions)
     # new sum of squares wrt the new means mt
     sumx2 = sumx2 + N0*(m0-mt[mod])**2
     s2t = sum(sumx2)/N
+    corr.s2t = (N/(N-K)) * s2t
     
     # Credibility interval
-    IC.inf = mt + qt((1-conf)/2,N-K)*sqrt(s2t/Nt)
-    IC.sup = mt + qt((1+conf)/2,N-K)*sqrt(s2t/Nt)
+    IC.inf = mt + qt((1-conf)/2,N-K)*sqrt(corr.s2t/Nt)
+    IC.sup = mt + qt((1+conf)/2,N-K)*sqrt(corr.s2t/Nt)
     
-    # Bayes factor
-    bic = N + N*log(2*pi*s2t) + length(mt)*log(N)
+    # BIC
+    t = length(mt) + 1
+    bic = N + N*log(2*pi*s2t) + t*log(N)
     prob = exp(-.5 * bic)
     
-    list(model=mod,means=mt[mod],error=sqrt(s2t),bic=bic,prob=prob,IC.inf=IC.inf[mod],IC.sup=IC.sup[mod])
+    # Model name
+    group.names=paste(1:length(m0))
+    model.name = tapply(group.names,mod,paste,collapse=",")
+    model.name = paste(sapply(model.name,function(x) paste("(",x,")",sep="")),collapse=",")
+    
+    list(model=mod,name=model.name,means=mt[mod],error=sqrt(corr.s2t),bic=bic,prob=prob,IC.inf=IC.inf[mod],IC.sup=IC.sup[mod])
   },
 
   #---------------------------------------------------------------------------------------
