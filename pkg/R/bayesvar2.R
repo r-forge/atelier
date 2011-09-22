@@ -85,13 +85,13 @@
   
   updatePlot = function(.,h,...) {
     
-    # Vérification des paramètres
+    # Check parameters
     if(any(is.na(c(svalue(.$priorn),svalue(.$priorparam1),svalue(.$priorparam2))))) {
       gmessage("Spécifiez des valeurs de paramètres pour la loi a priori.")
       return()
     }
     
-    # Vérification des paramètres
+    # Check data
     if(any(is.na(c(svalue(.$xbar),svalue(.$n))))) {
       gmessage("Indiquez des statistiques observées.")
       return()
