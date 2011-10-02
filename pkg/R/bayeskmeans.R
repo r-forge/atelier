@@ -1,7 +1,6 @@
 #-----------------------------------------------------------------------------------------
 #                  Inférence bayésienne sur plusieurs moyennes
 #-----------------------------------------------------------------------------------------
-library(partitions)
 
 .ws13 = proto(
 
@@ -15,9 +14,9 @@ library(partitions)
     
     add(.ws$nb,group <- ggroup(horizontal=FALSE),label="Inférence bayésienne\nsur plusieurs moyennes")
 
-   .$means = gedit("10  4 29 24 11",width=25,handler=.$updatePlot)
-   .$sds   = gedit("5.126960 3.162278 6.164414 6.369571 6.718843",width=25,handler=.$updatePlot)
-   .$Ntot  = gedit("8 8 8 8 8",width=25,handler=.$updatePlot)
+   .$means = gedit("",width=25,handler=.$updatePlot)
+   .$sds   = gedit("",width=25,handler=.$updatePlot)
+   .$Ntot  = gedit("",width=25,handler=.$updatePlot)
 
     add(group,tmp <- gframe("Données observées"))
     dataGroup = glayout(container=tmp)
@@ -75,6 +74,8 @@ library(partitions)
   },
   updatePlot = function(.,h,...) {
 
+    require(partitions)
+    
     if(svalue(.$doBMA) && !svalue(.$testAll)) {
       svalue(.$testAll) = TRUE
       # Return or the analysis is performed twice!
