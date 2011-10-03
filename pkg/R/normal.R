@@ -10,24 +10,27 @@
     if(inherits(try(is.environment(.ws)),"try-error")) return()
     
     # Don't create if already opened
-    if("Construction de\nla loi normale" %in% names(.ws$nb)) return()
+    if(.$translate("Construction of the\ngaussian distribution") %in% names(.ws$nb)) return()
     
+    names(.$availDists) = .$translate(names(availDists))
+    names(.$paramNames) = .$translate(names(paramNames))
+
    .$distribution = gdroplist(names(.$availDists),horizontal=FALSE,handler=.$updateParamNames)
    .$sampleSize = gradio(c(500, 1000, 5000, 50000),handler=.$updatePlot,coerce.with=as.numeric)
    .$nvar = gradio(c(1, 2, 10, 50),handler=.$updatePlot,coerce.with=as.numeric)
-   .$displayWhat = gradio(c("Effectifs","Fréquences","Densités"),handler=.$updatePlot)
-   .$displayFunc = gcheckbox("théorique",handler=.$updatePlot)
-   .$displayNorm = gcheckbox("normale",handler=.$updatePlot)
+   .$displayWhat = gradio(.$translate(c("Counts","Proportions","Densities")),handler=.$updatePlot)
+   .$displayFunc = gcheckbox(.$translate("theoretical"),handler=.$updatePlot)
+   .$displayNorm = gcheckbox(.$translate("gaussian"),handler=.$updatePlot)
    .$param1 = gedit("0",width=5,coerce.with=as.numeric)
-   .$paramLabel1 = glabel("Borne gauche")
+   .$paramLabel1 = glabel(.$translate("Left boundary"))
    .$param2 = gedit("1",width=5,coerce.with=as.numeric)
-   .$paramLabel2 = glabel("Borne droite")
+   .$paramLabel2 = glabel(.$translate("Right boundary"))
    .$cutpoints = gedit("",handler=.$updatePlot)
 
-    add(.ws$nb, group <- ggroup(horizontal=FALSE),label="Construction de\nla loi normale")
-    tmp = gframe("Distribution", container = group)
+    add(.ws$nb, group <- ggroup(horizontal=FALSE),label=.$translate("Construction of the\ngaussian distribution"))
+    tmp = gframe(.$translate("Distribution"), container = group)
     distribGroup = glayout(container=tmp)
-    distribGroup[2,2,anchor=c(-1,0)]=glabel("Loi")
+    distribGroup[2,2,anchor=c(-1,0)]=glabel(.$translate("Family"))
     distribGroup[2,3]=.$distribution
     distribGroup[3,2,anchor=c(-1,0)]=.$paramLabel1
     distribGroup[3,3]=.$param1
@@ -36,26 +39,26 @@
     visible( distribGroup)=TRUE
 
     sizeGroup = ggroup(cont = group,expand=TRUE)
-    tmp = gframe("Nombre d\'obs.", container =  sizeGroup,expand=TRUE)
+    tmp = gframe(.$translate("Sample size"), container =  sizeGroup,expand=TRUE)
     add(tmp, .$sampleSize)
-    tmp = gframe("Variables", container =  sizeGroup,expand=TRUE)
+    tmp = gframe(.$translate("Variables"), container =  sizeGroup,expand=TRUE)
     add(tmp, .$nvar)
 
-   histGroup = ggroup(cont = group,expand=TRUE)
-    tmp = gframe("Afficher", container = histGroup,expand=TRUE)
+    histGroup = ggroup(cont = group,expand=TRUE)
+    tmp = gframe(.$translate("Display"), container = histGroup,expand=TRUE)
     add(tmp,.$displayWhat)
-    tmp = gframe("Loi", container = histGroup, horizontal=FALSE,expand=TRUE)
+    tmp = gframe(.$translate("Family"), container = histGroup, horizontal=FALSE,expand=TRUE)
     add(tmp,.$displayFunc)
     add(tmp,.$displayNorm)
 
-    tmp = gframe("Coupures", container = group)
+    tmp = gframe(.$translate("Coupures"), container = group)
     add(tmp,.$cutpoints,expand=TRUE)
 
     addSpring(group)
 
     buttonGroup=ggroup(container=group)
     addSpring(buttonGroup)
-    gbutton("  Afficher  ",container=buttonGroup, handler=.$updatePlot)
+    gbutton(.$translate(.$translate("Plot"),container=buttonGroup, handler=.$updatePlot)
 
   },
   
@@ -63,7 +66,7 @@
 
     # Vérification des paramètres
     if(any(is.na(c(svalue(.$param1),svalue(.$param2))))) {
-      gmessage("Spécifiez des valeurs de paramètres.")
+      gmessage("Please provide parameter values.")
       return()
     }
     
@@ -87,13 +90,13 @@
     else { breaks = "sturges" }
 
     # Affichage de l'histogramme empirique (distributions continues)
-    if(svalue(.$distribution)!="Binomiale") { 
+    if(svalue(.$distribution)!=.$translate("Binomial")) { 
       hh = hist(x,breaks=breaks,plot=FALSE)
-      if(svalue(.$displayWhat)=="Fréquences") {
+      if(svalue(.$displayWhat)==.$translate("Proportions")) {
         hh$counts = hh$counts / nobs
       }
-      xlab = ifelse(nvar==1,"Valeurs de la variable","Valeurs de la variable somme")
-      plot(hh,freq=svalue(.$displayWhat)!="Densités",main = paste("Distribution",svalue(.$distribution)),xlab=xlab,ylab=svalue(.$displayWhat))
+      xlab = ifelse(nvar==1,.$translate("Variable values"),.$translate("Values of summed variables"))
+      plot(hh,freq=svalue(.$displayWhat)!=.$translate("Densities"),main = paste(.$translate("Distribution"),":",svalue(.$distribution)),xlab=xlab,ylab=svalue(.$displayWhat))
 
       # Affichage de la loi théorique
       if(svalue(.$displayFunc) && (nvar==1)) {
@@ -106,11 +109,11 @@
     else {
       # Affichage de l'histogramme empirique
       nn = table(x)
-      if(svalue(.$displayWhat) %in% c("Fréquences","Densités")) {
+      if(svalue(.$displayWhat) %in% .$translate(c("Proportions","Densities"))) {
         nn = nn / nobs
       }
-      xlab = ifelse(svalue(nvar)==1,"Valeurs de la variable","Valeurs de la variable somme")
-      res = plot(nn,main = paste("Distribution",svalue(.$distribution)),xlab=xlab,ylab=svalue(.$displayWhat))
+      xlab = ifelse(svalue(nvar)==1,.$translate("Variable values"),.$translate("Values of summed variables"))
+      res = plot(nn,main = paste(.$translate("Distribution"),svalue(.$distribution)),xlab=xlab,ylab=svalue(.$displayWhat))
 	
 	  # Affichage des probabilités théoriques
       if(svalue(.$displayFunc) && (nvar==1)) {
@@ -138,11 +141,15 @@
     svalue(.$paramLabel2) = .$paramNames[[newDist]][2]
     
   },
+  ### Gettext utility for translating messages
+  translate = function(.,...) {
+    gettext(..., domain="R-AtelieR")
+  },
   #---------------------------------------------------------------------------------------
   #  SLOT                   INITIAL VALUE                                    CONTENT
   #---------------------------------------------------------------------------------------
-  availDists     = c(Uniforme = "unif", Binomiale = "binom", Normale = "norm", Gamma = "gamma"),
-  paramNames     = list(Uniforme=c("Borne gauche","Borne droite"),Binomiale=c("Taille","Probabilité"),Normale=c("Moyenne","Ecart-type"),Gamma=c("Forme","Echelle")),
+  availDists     = c(Uniform = "unif", Binomial = "binom", Gaussian = "norm", Gamma = "gamma"),
+  paramNames     = list(Uniform=c("Left boudary","Right boundary"),Binomial=c("Size","Probability"),Gaussian=c("Mean","Standard deviation"),Gamma=c("Shape","Scale")),
   distribution   = NULL,
   sampleSize     = NULL,
   nvar           = NULL,

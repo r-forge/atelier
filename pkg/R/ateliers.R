@@ -15,33 +15,32 @@
    create = function(.) {
    
      # Interface
-    .$window = gwindow("AtelieR : Ateliers de statistiques sous R",visible=FALSE)
+    .$window = gwindow(.$translate("AtelieR: Statistical workshops in R"),visible=FALSE)
     .$bigGroup = ggroup(cont = window)
     .$statusBar = gstatusbar("Prêt.",cont=.$window)
      add(.$bigGroup,.$nb <- gnotebook(tab.pos=2,closebuttons=TRUE),expand=TRUE)
      add(.$bigGroup,ggraphics())
 
-     # Menus
-     tmp = list()
-
-     # Menu fichier
-     tmp$Session$Quitter$handler = function(h,...) dispose(window)
-     tmp$Session$Quitter$icon = "quit"
-
-     # Menu ateliers
-     tmp$Ateliers$Comprendre$"Construction de la loi normale"$handler               = .ws1$create
-     tmp$Ateliers$Comprendre$"Changement d\'origine et d\'échelle"$handler          = .ws2$create
-     tmp$Ateliers$Comprendre$"Distribution d'une moyenne d\'échantillon"$handler    = .ws3$create
-     tmp$Ateliers$Calculer$"Calculateur de probabilités"$handler                    = .ws4$create
-     tmp$Ateliers$Comprendre$"Distribution d\'une variance d\'échantillon"$handler  = .ws5$create
-     tmp$Ateliers$Calculer$"Inférence bayésienne sur une proportion"$handler        = .ws6$create
-     tmp$Ateliers$Calculer$"Inférence bayésienne sur plusieurs proportions"$handler = .ws9$create
-     tmp$Ateliers$Calculer$"Inférence bayésienne sur table de contingence"$handler  = .ws10$create
-     tmp$Ateliers$Calculer$"Inférence bayésienne sur une variance"$handler          = .ws11$create
-     tmp$Ateliers$Calculer$"Inférence bayésienne sur une moyenne"$handler           = .ws8$create
-     tmp$Ateliers$Calculer$"Inférence bayésienne sur plusieurs moyennes"$handler    = .ws13$create
-    .$menu = gmenu(tmp,cont=window)
-
+     # File menu
+     aClose     = gaction(label=.$translate("Quit"),icon="quit",handler=function(h,...) dispose(.$window))
+     aNormal    = gaction(label=.$translate("Construction of the gaussian distribution"),handler=.ws1$create)
+     aScale     = gaction(label=.$translate("Change of origin and scale"),               handler=.ws2$create)
+     aMean      = gaction(label=.$translate("Distribution of a sample mean"),            handler=.ws3$create)
+     aVar       = gaction(label=.$translate("Distribution of a sample variance"),        handler=.ws5$create)
+     aCalc      = gaction(label=.$translate("Probability calculator"),                   handler=.ws4$create)
+     aProp      = gaction(label=.$translate("Bayesian inference on a proportion"),       handler=.ws6$create)
+     aKprop     = gaction(label=.$translate("Bayesian inference on several proportions"),handler=.ws9$create)
+     aTable     = gaction(label=.$translate("Bayesian inference on a contingency table"),handler=.ws10$create)
+     aBayesvar  = gaction(label=.$translate("Bayesian inference on a variance"),         handler=.ws11$create)
+     aBayesmean = gaction(label=.$translate("Bayesian inference on a mean"),             handler=.ws8$create)
+     aKmeans    = gaction(label=.$translate("Bayesian inference on several means"),      handler=.ws13$create)
+     
+     tmp = list(Session  = list(quit=aClose),
+                Ateliers = list(Understand = list(aNormal,aScale,aMean,aVar),
+                                Compute    = list(aCalc,aProp,aKprop,aTable,aBayesvar,aBayesmean,aKmeans)))
+     names(tmp) = .$translate(names(tmp))
+    .$menu = gmenu(tmp,cont=.$window)
+   
    },
    
    show = function(.) {
@@ -52,6 +51,11 @@
    setStatus = function(.,text) {
      svalue(.$statusBar)
      svalue(.$statusBar) = text
+   },
+
+   ### Gettext utility for translating messages
+   translate = function(.,...) {
+     gettext(..., domain="R-AtelieR")
    },
 
   #---------------------------------------------------------------------------------------

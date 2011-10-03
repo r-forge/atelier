@@ -10,49 +10,49 @@
     if(inherits(try(is.environment(.ws)),"try-error")) return()
     
     # Don't create if already opened
-    if("Distribution\nd\'une variance" %in% names(.ws$nb)) return()
+    if(.$translate("Distribution of\na sample variance") %in% names(.ws$nb)) return()
     
-    .$sampleSize   = gradio(c(10,20,50,100),handler=.$updatePlot,coerce.with=as.numeric)
-    .$nvar         = gradio(c(5,10,50,500),handler=.$updatePlot,coerce.with=as.numeric)
-    .$compType     = gradio(c("Avec moyenne vraie","Avec moyenne d\'échantillon","Variance d\'échantillon corrigée"),handler=.$updatePlot)
-    .$displayNorm  = gcheckbox("la loi normale",handler=.$updatePlot)
-    .$popDistr     = gcheckbox("la loi de Chi-2",handler=.$updatePlot)
-    .$param1       = gedit("0",width=5,coerce.with=as.numeric)
-    .$param2       = gedit("1",width=5,coerce.with=as.numeric)
-    .$var          = glabel("")
-    .$truevar      = glabel("")
+   .$sampleSize   = gradio(c(10,20,50,100),handler=.$updatePlot,coerce.with=as.numeric)
+   .$nvar         = gradio(c(5,10,50,500),handler=.$updatePlot,coerce.with=as.numeric)
+   .$compType     = gradio(.$translate(c("With true mean","With sample mean","Corrected variance")),handler=.$updatePlot)
+   .$displayNorm  = gcheckbox(.$translate("gaussian dist."),handler=.$updatePlot)
+   .$popDistr     = gcheckbox(.$translate("Chi-2 dist."),handler=.$updatePlot)
+   .$param1       = gedit("0",width=5,coerce.with=as.numeric)
+   .$param2       = gedit("1",width=5,coerce.with=as.numeric)
+   .$var          = glabel("")
+   .$truevar      = glabel("")
 
     # Construction de l'interface
-    add(.ws$nb,group <- ggroup(horizontal=FALSE),label="Distribution\nd\'une variance")
+    add(.ws$nb,group <- ggroup(horizontal=FALSE),label=.$translate("Distribution of\na sample variance"))
 
-    tmp = gframe("Loi normale des scores", container = group)
+    tmp = gframe(.$translate("Gaussian distribution of scores"), container = group)
     distribGroup = glayout(container=tmp)
-    distribGroup[2,2,anchor=c(-1,0)]=glabel("Moyenne")
+    distribGroup[2,2,anchor=c(-1,0)]=glabel(.$translate("Mean"))
     distribGroup[2,3]=.$param1
-    distribGroup[3,2,anchor=c(-1,0)]=glabel("Ecart-type")
+    distribGroup[3,2,anchor=c(-1,0)]=glabel(.$translate("Standard deviation"))
     distribGroup[3,3]=.$param2
     visible(distribGroup)=TRUE
 
-    tmp = gframe("Calcul de la variance", container = group, horizontal=FALSE)
+    tmp = gframe(.$translate("Variance computation"), container = group, horizontal=FALSE)
     add(tmp,.$compType)
 
     sizeGroup = ggroup(cont = group,expand=TRUE)
-    tmp = gframe("Echantillons", container = sizeGroup,expand=TRUE)
+    tmp = gframe(.$translate("Samples"), container = sizeGroup,expand=TRUE)
     add(tmp, .$nvar)
-    tmp = gframe("Obs. par éch.", container = sizeGroup,expand=TRUE)
+    tmp = gframe(.$translate("Obs. by sample"), container = sizeGroup,expand=TRUE)
     add(tmp, .$sampleSize)
 
     # Options d'affichage
-    tmp = gframe("Afficher", container = group, horizontal=FALSE)
+    tmp = gframe(.$translate("Display"), container = group, horizontal=FALSE)
     add(tmp,.$popDistr)
     add(tmp,.$displayNorm)
 
     # Statistiques descriptives
-    tmp = gframe("Statistiques descriptives", container = group, horizontal=FALSE)
+    tmp = gframe(.$translate("Descriptive statistics"), container = group, horizontal=FALSE)
     resGroup = glayout(container=tmp)
-    resGroup[2,2,anchor=c(-1,0)]=glabel("Espérance")
+    resGroup[2,2,anchor=c(-1,0)]=glabel(.$translate("Expected mean"))
     resGroup[2,3]=.$truevar
-    resGroup[3,2,anchor=c(-1,0)]=glabel("Moyenne empirique")
+    resGroup[3,2,anchor=c(-1,0)]=glabel(.$translate("Observed mean"))
     resGroup[3,3]=.$var
     visible(resGroup)=TRUE
 
@@ -60,14 +60,14 @@
 
     buttonGroup=ggroup(container=group)
     addSpring(buttonGroup)
-    gbutton("  Echantillonner  ",container=buttonGroup, handler=.$updatePlot)
+    gbutton("Sample",container=buttonGroup, handler=.$updatePlot)
   },
   
   updatePlot = function(.,h,...) {
 
     # Vérification des paramètres
     if(any(is.na(c(svalue(.$param1),svalue(.$param2))))) {
-      gmessage("Spécifiez des valeurs de paramètres.")
+      gmessage("Please provide parameter values.")
       return()
     }
     
@@ -107,8 +107,8 @@
     }
 
     # Affichage graphique  
-    title = "Distribution des variances"
-    ylab = "Densités"
+    title = .$translate("Distribution of sample variances")
+    ylab = .$translate("Densities")
 
     avg.var = mean(sample.vars)
     xlim = c(0,max(sample.vars))
@@ -126,7 +126,11 @@
     svalue(.$var) = paste(round(avg.var,3))
 
   },
-  
+  ### Gettext utility for translating messages
+  translate = function(.,...) {
+    gettext(..., domain="R-AtelieR")
+  },
+
   #---------------------------------------------------------------------------------------
   #  SLOT                   INITIAL VALUE                                    CONTENT
   #---------------------------------------------------------------------------------------

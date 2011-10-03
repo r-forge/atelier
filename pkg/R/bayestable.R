@@ -10,10 +10,10 @@
     if(inherits(try(is.environment(.ws)),"try-error")) return()
     
     # Don't create if already opened
-    if("Inférence bayésienne\nsur table de contingence" %in% names(.ws$nb)) return()
-    add(.ws$nb,group <- ggroup(horizontal=FALSE),label="Inférence bayésienne\nsur table de contingence")
+    if(.$translate("Bayesian inference\non a contingency table") %in% names(.ws$nb)) return()
+    add(.ws$nb,group <- ggroup(horizontal=FALSE),label=.$translate("Bayesian inference\non a contingency table"))
     
-    add(group,tmp <- gframe("Données observées"),expand=TRUE)
+    add(group,tmp <- gframe(.$translate("Observed data"),expand=TRUE))
     add(tmp, .$counts <- gtext(""),expand=TRUE,font.attr=c(family="monospace"))
 
    .$alpha = gedit("1",width=3,coerce.with=as.numeric,handler=.$compute)
@@ -22,32 +22,32 @@
    .$bf = glabel("")
    .$possible = glabel("")
    .$postprob = glabel("")
-   .$testAll = gcheckbox("Tout tester",checked=FALSE,handler=.$onTestAll)
+   .$testAll = gcheckbox(.$translate("Test all"),checked=FALSE,handler=.$onTestAll)
    .$bestOne = glabel("")
 
-    add(group,tmp <- gframe("Validation de modèle"))
+    add(group,tmp <- gframe(.$translate("Model validation")))
     testGroup = glayout(container=tmp)
-    testGroup[2,2,anchor=c(-1,0)] = glabel("Param. a priori")
+    testGroup[2,2,anchor=c(-1,0)] = glabel(.$translate("Prior parameter"))
     testGroup[2,3] = .$alpha
-    testGroup[3,2,anchor=c(-1,0)] = glabel("Modèles possibles")
+    testGroup[3,2,anchor=c(-1,0)] = glabel(.$translate("Possible models"))
     testGroup[3,3] = .$possible
-    testGroup[4,2,anchor=c(-1,0)] = glabel("Modèle cible")
+    testGroup[4,2,anchor=c(-1,0)] = glabel(.$translate("Target model"))
     testGroup[4,3] = .$model
-    testGroup[5,2,anchor=c(-1,0)] = glabel("Pr(M) a priori")
+    testGroup[5,2,anchor=c(-1,0)] = glabel(.$translate("Prior Pr(M)"))
     testGroup[5,3] =.$priorprob
     testGroup[6,3] =.$testAll
-    testGroup[7,2] = glabel("Meilleur modèle")
+    testGroup[7,2] = glabel(.$translate("Best model"))
     testGroup[7,3] =.$bestOne
-    testGroup[8,2] = glabel("Facteur de Bayes")
+    testGroup[8,2] = glabel(.$translate("Bayes Factor"))
     testGroup[8,3] =.$bf
-    testGroup[9,2] = glabel("Pr(M|D)")
+    testGroup[9,2] = glabel(.$translate("Pr(M|D)"))
     testGroup[9,3] =.$postprob
     testGroup[10,1] = ""
     visible(testGroup)=TRUE
 
-    add(group, tmp <- gframe("Estimations a posteriori"),expand=TRUE)
+    add(group, tmp <- gframe(.$translate("Posterior estimates")),expand=TRUE)
     add(tmp, .$estimNb <- gnotebook(), expand=TRUE)
-    add(.$estimNb, tmp <- ggroup(),label="Modèle",expand=TRUE)
+    add(.$estimNb, tmp <- ggroup(),label=.$translate("Model"),expand=TRUE)
     add(tmp,.$postestim <- gtext("",font.attr=c(family="monospace")),expand=TRUE)
     add(.$estimNb, tmp <- ggroup(),label="Moyennes",expand=TRUE)
     add(tmp,.$avestim <- gtext("",font.attr=c(family="monospace")),expand=TRUE)
@@ -55,7 +55,7 @@
 
     buttonGroup=ggroup(container=group)
     addSpring(buttonGroup)
-    gbutton("  Calculer  ",container=buttonGroup, handler=.$compute)
+    gbutton(.$translate("Compute"),container=buttonGroup, handler=.$compute)
   
     # A associer en dernier pour ne pas déclencher pendant la construction
     addHandlerChanged(.$estimNb,.$updatePlot)
@@ -66,7 +66,7 @@
 
     # Vérification des paramètres
     if(is.na(svalue(.$alpha))) {
-      gmessage("Spécifiez le paramètre pour la loi Dirichlet symétrique a priori.")
+      gmessage(.$translate("Please specify a parameter value for the Dirichlet prior."))
       return()
     }
     a = svalue(.$alpha)
@@ -74,18 +74,18 @@
     # Vérification des données
    .$getData()
     if(is.null(.$n)) {
-      gmessage("Indiquez des valeurs observées.")
+      gmessage(.$translate("Please specify observed data."))
       return()
     }
     
     if(any(.$n<0)) {
-      gmessage("Erreur : toutes les lignes n'ont pas le même nombre de valeurs.")
+      gmessage(.$translate("Error: All rows in the table should\ncontain the same number of values."))
       return()
     }
 
     I = nrow(.$n)
     if(I<2) {
-      gmessage("Spécifiez au moins deux lignes de comptages.")
+      gmessage(.$translate("Please provide at least two count rows."))
       return()
     }
 
@@ -98,7 +98,7 @@
     
     m = .$getModel()
     if( (length(m) != I) && !svalue(.$testAll)) {
-      gmessage("Nombre de groupes incorrect dans la définition du modèle.")
+      gmessage(.$translate("Incorrect number of groups in model definition."))
       return()
     }
     
@@ -116,7 +116,7 @@
       return()
     }
 
-   .ws$setStatus("Analyse en cours...")
+   .ws$setStatus(.$translate("Estimation in progress..."))
     svalue(.$bestOne) = ""
 
     # Reference models (null and saturated)
@@ -186,7 +186,7 @@
     }
     
    .$updatePlot(h,...)
-   .ws$setStatus("Prêt.")
+   .ws$setStatus(.$translate("Ready."))
    
   },
   
@@ -195,18 +195,18 @@
     # Graphique de base : modèle homogène
     C = ncol(.$n)
     responses = paste(1:C)
-    matplot(t(.$p0),type="l",col="grey",lwd=2,xlab="Réponses",ylab="Probabilités estimées",ylim=c(0,1),main="",xaxt="n")
+    matplot(t(.$p0),type="l",col="grey",lwd=2,xlab=.$translate("Response"),ylab=.$translate("Estimated probabilities"),ylim=c(0,1),main="",xaxt="n")
     axis(1,1:C,responses)
 
     # Estimation modèle
     estimType = if(is.null(h$pageno)) svalue(.$estimNb) else h$pageno
     if(estimType == 1) {
       matlines(t(.$p1),col="red",lwd=2,lty=.$groups)
-      legend("topleft",lty=1,lwd=2,col=c("red","gray"),legend=c(ifelse(svalue(.$testAll),"Meilleur","Cible"),"Homogène"),inset=.01)
+      legend("topleft",lty=1,lwd=2,col=c("red","gray"),legend=c(ifelse(svalue(.$testAll),.$translate("Best"),.$translate("Target")),.$translate("Homogeneous")),inset=.01)
     }
     else {
       matlines(t(.$avestimates),lwd=2,col="blue",lty=.$groups)
-      legend("topleft",lty=1,lwd=2,col=c("blue","gray"),legend=c("Moyenne","Homogène"),inset=.01)
+      legend("topleft",lty=1,lwd=2,col=c("blue","gray"),legend=.$translate(c("Averaged","Homogeneous")),inset=.01)
     }
     
     # Saturé
@@ -272,7 +272,10 @@
     if(svalue(.$testAll)) enabled(.$model) = FALSE
     else                  enabled(.$model) = TRUE    
   },
-
+  ### Gettext utility for translating messages
+  translate = function(.,...) {
+    gettext(..., domain="R-AtelieR")
+  },
   #---------------------------------------------------------------------------------------
   #  SLOT                   INITIAL VALUE                                    CONTENT
   #---------------------------------------------------------------------------------------

@@ -10,21 +10,21 @@
     if(inherits(try(is.environment(.ws)),"try-error")) return()
     
     # Don't create if already opened
-    if("Inférence bayésienne\nsur plusieurs moyennes" %in% names(.ws$nb)) return()
+    if(.$translate("Bayesian inference\non several means") %in% names(.ws$nb)) return()
     
-    add(.ws$nb,group <- ggroup(horizontal=FALSE),label="Inférence bayésienne\nsur plusieurs moyennes")
+    add(.ws$nb,group <- ggroup(horizontal=FALSE),label=.$translate("Bayesian inference\non several means"))
 
    .$means = gedit("",width=25,handler=.$updatePlot)
    .$sds   = gedit("",width=25,handler=.$updatePlot)
    .$Ntot  = gedit("",width=25,handler=.$updatePlot)
 
-    add(group,tmp <- gframe("Données observées"))
+    add(group,tmp <- gframe(.$translate("Observed data")))
     dataGroup = glayout(container=tmp)
-    dataGroup[2,2,anchor=c(-1,0)] = glabel("Moyennes")
+    dataGroup[2,2,anchor=c(-1,0)] = glabel(.$translate("Means"))
     dataGroup[2,3] = .$means
-    dataGroup[3,2,anchor=c(-1,0)] = glabel("Ecarts-type")
+    dataGroup[3,2,anchor=c(-1,0)] = glabel(.$translate("Standard dev."))
     dataGroup[3,3] = .$sds
-    dataGroup[4,2,anchor=c(-1,0)] = glabel("Effectifs")
+    dataGroup[4,2,anchor=c(-1,0)] = glabel(.$translate("Sample sizes"))
     dataGroup[4,3] = .$Ntot
     dataGroup[5,1]= ""
     visible(dataGroup) = TRUE
@@ -34,35 +34,37 @@
    .$bf = glabel("")
    .$possible = glabel("")
    .$postprob = glabel("")
-   .$testAll = gcheckbox("Tout tester",checked=FALSE,handler=.$onTestAll)
+   .$testAll = gcheckbox(.$translate("Test all"),checked=FALSE,handler=.$onTestAll)
    .$bestOne = glabel("")
-   .$doBMA = gcheckbox("Moyenner",handler=.$updatePlot)
+   .$doBMA = gcheckbox(.$translate("Average"),handler=.$updatePlot)
 
-    add(group,tmp <- gframe("Test d\'hypothèse"))
+    add(group,tmp <- gframe(.$translate("Hypothesis test")))
     testGroup = glayout(container=tmp)
-    testGroup[2,2,anchor=c(-1,0)] = glabel("Modèles possibles")
+    testGroup[2,2,anchor=c(-1,0)] = glabel(.$translate("Possible models"))
     testGroup[2,3] = .$possible
-    testGroup[3,2,anchor=c(-1,0)] = glabel("Modèle cible")
+    testGroup[3,2,anchor=c(-1,0)] = glabel(.$translate("Target model"))
     testGroup[3,3] = .$model
-    testGroup[4,2,anchor=c(-1,0)] = glabel("Pr(M) a priori")
+    testGroup[4,2,anchor=c(-1,0)] = glabel(.$translate("Prior Pr(M)"))
     testGroup[4,3] =.$priorprob
     testGroup[5,2] =.$testAll
     testGroup[5,3] =.$doBMA
-    testGroup[6,2] = glabel("Meilleur modèle")
+    testGroup[6,2] = glabel(.$translate("Best model"))
     testGroup[6,3] =.$bestOne
-    testGroup[7,2] = glabel("BIC")
+    testGroup[7,2] = glabel(.$translate("BIC"))
     testGroup[7,3] =.$bf
-    testGroup[8,2] = glabel("Pr(M|D)")
+    testGroup[8,2] = glabel(.$translate("Pr(M|D)"))
     testGroup[8,3] =.$postprob
     testGroup[9,1] = ""
     visible(testGroup)=TRUE
 
-    add(group, tmp <- gframe("Estimations a posteriori des modèles"),expand=TRUE)
-    add(tmp,.$postestim <- gtable(cbind(Groupe=rep("",10),Moyennes=rep("",10),Inf95=rep("",10),Sup95=rep("",10))),expand=TRUE)
+    add(group, tmp <- gframe(.$translate("Model posterior estimates")),expand=TRUE)
+    est.tab = cbind(Group=rep("",10),Means=rep("",10),Inf95=rep("",10),Sup95=rep("",10))
+    names(est.tab) = .$translate(names(est.tab))
+    add(tmp,.$postestim <- gtable(est.tab),expand=TRUE)
 
     buttonGroup = ggroup(container=group)
     addSpring(buttonGroup)
-    gbutton("  Calculer  ",container=buttonGroup, handler=.$updatePlot)
+    gbutton(.$translate("Compute"),container=buttonGroup, handler=.$updatePlot)
   
   },
   onTestAll = function(.,h,...) {
@@ -84,7 +86,7 @@
     
     # Vérification des données
     if(any(is.na(c(svalue(.$means),svalue(.$sds))))) {
-      gmessage("Indiquez des valeurs observées.")
+      gmessage(.$translate("Please specify observed data."))
       return()
     }
     
@@ -97,7 +99,7 @@
 
     # Check data input
     if( (length(mn)<2) || (length(sd)<2) || (length(N)<2) || (var(c(length(mn),length(sd),length(N)))!=0) ) {
-      gmessage("Spécifiez au moins deux groupes.\nVérifiez qu'il y a autant de valeurs dans les 3 champs")
+      gmessage(.$translate("Please specify at least two groups.\nMake sure there are as many values in all three fields."))
       return()
     }
     
@@ -114,11 +116,11 @@
     # Check model definition
     m = .$getModel()
     if(length(m) != K) {
-      gmessage("Nombre de groupes incorrect dans la définition du modèle.")
+      gmessage(.$translate("Incorrect number of groups in model definition."))
       return()
     }
     
-   .ws$setStatus("Analyse en cours...")
+   .ws$setStatus(.$translate("Estimation in progress..."))
     svalue(.$bestOne) = ""
 
     # Generate all possible model definitions
@@ -162,8 +164,8 @@
       
         # A posteriori model averaged estimations (Neath & Cavanaugh, 2006)
         post.estim = colSums(results*modProbs)
-        target = list(name="Averaged",means=post.estim[1:K],IC.inf=post.estim[(K+1):(2*K)],IC.sup=post.estim[(2*K+1):(3*K)])
-        svalue(.$bestOne) = "(Moyenné)"
+        target = list(name=.$translate("Averaged"),means=post.estim[1:K],IC.inf=post.estim[(K+1):(2*K)],IC.sup=post.estim[(2*K+1):(3*K)])
+        svalue(.$bestOne) = .$translate("Averaged")
         svalue(.$bf) = ""
         svalue(.$postprob) = ""
       }
@@ -210,16 +212,16 @@
     # Plot
     ymin = min(msat$means) - 3*msat$error/sqrt(min(N))
     ymax = max(msat$means) + 3*msat$error/sqrt(min(N))
-    plot(1:K,msat$means,xlab="Groupes",ylab="Moyennes estimées",main="",type="n",xaxt="n",ylim=c(ymin,ymax))
+    plot(1:K,msat$means,xlab=.$translate("Group"),ylab=.$translate("Estimated means"),main="",type="n",xaxt="n",ylim=c(ymin,ymax))
     axis(1,1:K,paste(1:K))
     abline(h=m0$means[1],col="lightgrey",lty=2,lwd=2)
     
     points(1:K,msat$means,cex=1.5)
     for(k in 1:K) lines(rbind(c(k,target$IC.inf[k]),c(k,target$IC.sup[k])),col="red")
     points(1:K,target$means,pch=19,col="red")
-    legend("topleft",pch=c(1,19),pt.cex=1.2,col=c("black","red"),legend=c("Données","Modèle"),inset=.01)
+    legend("topleft",pch=c(1,19),pt.cex=1.2,col=c("black","red"),legend=.$translate(c("Data","Model")),inset=.01)
     
-   .ws$setStatus("Prêt.")
+   .ws$setStatus(.$translate("Ready."))
   },
   getModel = function(.) {
   
@@ -260,6 +262,11 @@
     model.name = paste(sapply(model.name,function(x) paste("(",x,")",sep="")),collapse=",")
     
     list(model=mod,name=model.name,means=mt[mod],error=sqrt(corr.s2t),bic=bic,prob=prob,IC.inf=IC.inf[mod],IC.sup=IC.sup[mod])
+  },
+
+  ### Gettext utility for translating messages
+  translate = function(.,...) {
+    gettext(..., domain="R-AtelieR")
   },
 
   #---------------------------------------------------------------------------------------

@@ -9,13 +9,13 @@
     if(inherits(try(is.environment(.ws)),"try-error")) return()
     
     # Don't create if already opened
-    if("Inférence bayésienne\nsur une proportion" %in% names(.ws$nb)) return()
+    if(.$translate("Bayesian inference\non a proportion") %in% names(.ws$nb)) return()
     
    .$betaparam1 = gedit("1",width=15,coerce.with=as.numeric,handler=.$updatePlot)
    .$betaparam2 = gedit("1",width=15,coerce.with=as.numeric,handler=.$updatePlot)
 
-    add(.ws$nb,group <- ggroup(horizontal=FALSE),label="Inférence bayésienne\nsur une proportion")
-    tmp = gframe("Loi Beta a priori", container = group,horizontal=FALSE)
+    add(.ws$nb,group <- ggroup(horizontal=FALSE),label=.$translate("Bayesian inference\non a proportion"))
+    tmp = gframe(.$translate("Beta prior"), container = group,horizontal=FALSE)
     priorGroup = glayout(container=tmp)
     priorGroup[2,2,anchor=c(-1,0)]=glabel("a=")
     priorGroup[2,3,anchor=c(-1,0)]=.$betaparam1
@@ -26,11 +26,11 @@
    .$success = gedit("6",width=15,handler=.$updatePlot)
    .$Ntot = gedit("10",width=15,handler=.$updatePlot)
 
-    tmp = gframe("Données observées", container = group)
+    tmp = gframe(.$translate("Observed data"), container = group)
     dataGroup = glayout(container=tmp)
-    dataGroup[2,2,anchor=c(-1,0)]=glabel("Succès")
+    dataGroup[2,2,anchor=c(-1,0)]=glabel(.$translate("Successes"))
     dataGroup[2,3]=.$success
-    dataGroup[3,2,anchor=c(-1,0)]=glabel("Total")
+    dataGroup[3,2,anchor=c(-1,0)]=glabel(.$translate("Total"))
     dataGroup[3,3]=.$Ntot
     visible(dataGroup)=TRUE
 
@@ -41,17 +41,17 @@
    .$postconf = gedit("0.05")
    .$interval = glabel("")
 
-    tmp = gframe("Statistiques a posteriori", container = group)
+    tmp = gframe(.$translate("Posterior statistics"), container = group)
     statsGroup = glayout(container=tmp)
-    statsGroup[2,2,anchor=c(-1,0)]=glabel("Niveau")
+    statsGroup[2,2,anchor=c(-1,0)]=glabel(.$translate("Level"))
     statsGroup[2,3]=.$level
-    statsGroup[3,2]=glabel("Crédibilité")
+    statsGroup[3,2]=glabel(.$translate("Credibility"))
     statsGroup[3,3:4]=.$interval
-    statsGroup[4,2]=glabel("Moyenne")
+    statsGroup[4,2]=glabel(.$translate("Mean"))
     statsGroup[4,3]=.$postmean
-    statsGroup[5,2]=glabel("Mode")
+    statsGroup[5,2]=glabel(.$translate("Mode"))
     statsGroup[5,3]=.$postmode
-    statsGroup[6,2]=glabel("Ecart-type")
+    statsGroup[6,2]=glabel(.$translate("Standard deviation"))
     statsGroup[6,3]=.$postsd
     visible(statsGroup)=TRUE
 
@@ -62,15 +62,15 @@
    .$op = gdroplist(c("H : pi <","H : pi =","H : pi >"),handler=.$updatePlot)
     svalue(.$op,index=TRUE) = 2
 
-    tmp = gframe("Test d\'hypothèse", container = group)
+    tmp = gframe(.$translate(.$translate("Hypothesis test")), container = group)
     testGroup = glayout(container=tmp)
     testGroup[2,2,anchor=c(-1,0)]=.$op
     testGroup[2,3]=.$value
-    testGroup[3,2,anchor=c(-1,0)]=glabel("Pr(H) a priori")
+    testGroup[3,2,anchor=c(-1,0)]=glabel(.$translate("Prior Pr(H)"))
     testGroup[3,3]=.$priorprob
-    testGroup[4,2]=glabel("Facteur de Bayes")
+    testGroup[4,2]=glabel(.$translate("Bayes Factor"))
     testGroup[4,3]=.$bf
-    testGroup[5,2]=glabel("Pr(H|D)")
+    testGroup[5,2]=glabel(.$translate("Pr(H|D)"))
     testGroup[5,3]=.$postprob
     visible(testGroup)=TRUE
 
@@ -78,7 +78,7 @@
 
     buttonGroup=ggroup(container=group)
     addSpring(buttonGroup)
-    gbutton("  Afficher  ",container=buttonGroup, handler=.$updatePlot)
+    gbutton(.$translate("Display"),container=buttonGroup, handler=.$updatePlot)
   
   },
   
@@ -86,13 +86,13 @@
 
     # Vérification des paramètres
     if(any(is.na(c(svalue(.$betaparam1),svalue(.$betaparam2))))) {
-      gmessage("Spécifiez des valeurs de paramètres pour la loi Beta a priori.")
+      gmessage(.$translate("Please specify prior parameters."))
       return()
     }
     
     # Vérification des paramètres
     if(any(is.na(c(svalue(.$success),svalue(.$Ntot))))) {
-      gmessage("Indiquez des valeurs observées.")
+      gmessage(.$translate("Please specify observed data."))
       return()
     }
       
@@ -148,7 +148,7 @@
       svalue(.$postprob) = round(post.prob,4)
     }
 
-    plot(p, post, type = "l", xlab="Probabilité du succès",ylab = "Densité", lty = 1, lwd = 2, main = "Probabilité a posteriori", xlim=c(0,1),ylim = c(0, max(m,5)))
+    plot(p, post, type = "l", xlab=.$translate("Probability of success"),ylab = .$translate("Density"), lty = 1, lwd = 2, main = .$translate("Posterior probability"), xlim=c(0,1),ylim = c(0, max(m,5)))
     z = seq(q1,q2,len=500)
 
     # One-sided regions
@@ -163,10 +163,13 @@
     lines(p, lh, lty = 2, lwd = 2, col = "red")
     lines(p, prior, lty = 3, lwd = 2, col = "darkgreen")
     if(op == "H : pi =") text((q2+q1)/2,max(post)/3,cex=1.3,paste(round(conf*100),"%",sep=""))
-    legend("topright", c("Loi a priori", "Vraisemblance", "Loi a Posteriori"), cex=.8,lty = c(3,2,1), lwd = rep(2,3), col = c("darkgreen", "red", "black"),inset=0.01,bg="white")
+    legend("topright", .$translate(c("Prior", "Likelihood", "Posterior")), cex=.8,lty = c(3,2,1), lwd = rep(2,3), col = c("darkgreen", "red", "black"),inset=0.01,bg="white")
   
   },
-  
+  ### Gettext utility for translating messages
+  translate = function(.,...) {
+    gettext(..., domain="R-AtelieR")
+  },
   #---------------------------------------------------------------------------------------
   #  SLOT                   INITIAL VALUE                                    CONTENT
   #---------------------------------------------------------------------------------------

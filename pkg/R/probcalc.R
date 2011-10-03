@@ -10,23 +10,26 @@
     if(inherits(try(is.environment(.ws)),"try-error")) return()
     
     # Don't create if already opened
-    if("Calculateur\nde probabilités" %in% names(.ws$nb)) return()
+    if(.$translate("Probability\ncalculator") %in% names(.ws$nb)) return()
     
+    names(.$availDists) = .$translate(names(availDists))
+    names(.$paramNames) = .$translate(names(paramNames))
+
    .$distribution = gdroplist(names(.$availDists),horizontal=FALSE,handler=.$initOptions)
    .$param1 = gedit("0",width=15)
    .$param2 = gedit("1",width=15)
    .$param3 = gedit("",width=15)
     enabled(.$param3) = FALSE
-   .$paramLabel1 = glabel("Moyenne")
-   .$paramLabel2 = glabel("Ecart-type")
+   .$paramLabel1 = glabel(.$translate("Mean"))
+   .$paramLabel2 = glabel(.$translate("Standard dev."))
    .$paramLabel3 = glabel("")
    
     # Construction de l'interface
-    add(.ws$nb, group <- ggroup(horizontal=FALSE),label="Calculateur\nde probabilités")
+    add(.ws$nb, group <- ggroup(horizontal=FALSE),label=.$translate("Probability\ncalculator"))
 
-    tmp = gframe("Distribution d\'origine",container=group)
+    tmp = gframe(.$translate("Distribution"),container=group)
     distribGroup = glayout(container=tmp)
-    distribGroup[2,2,anchor=c(-1,0)]=glabel("Loi")
+    distribGroup[2,2,anchor=c(-1,0)]=glabel(.$translate("Family"))
     distribGroup[2,3]=.$distribution
     distribGroup[3,2,anchor=c(-1,0)]=.$paramLabel1
     distribGroup[3,3]=.$param1
@@ -36,22 +39,22 @@
     distribGroup[5,3]=.$param3
     visible(distribGroup)=TRUE
 
-   .$calcWhat = gradio(c("Quantile    =>  probabilité","Probabilité =>  quantile"),handler=.$updatePlot)
-    tmp = gframe("Type de calcul",container=group)
+   .$calcWhat = gradio(.$translate(c("Quantile    =>  probability","Probability =>  quantile")),handler=.$updatePlot)
+    tmp = gframe(.$translate("Computation"),container=group)
     add(tmp,.$calcWhat)
 
-   .$side = gradio(c("A gauche","A droite"),handler=.$updatePlot)
-    tmp = gframe("Cumul",container=group)
+   .$side = gradio(.$translate(c("Left-sided","Right-sided")),handler=.$updatePlot)
+    tmp = gframe(.$translate("Cumulative probability"),container=group)
     add(tmp,.$side)
 
    .$value  = gedit(width=15,handler=.$updatePlot)
    .$resultx = glabel("")
    .$resultp = glabel("")
 
-    tmp = gframe("Valeur ou expression à calculer",container=group)
+    tmp = gframe(.$translate("Value or expression to compute"),container=group)
     add(tmp,.$value,expand=TRUE)
 
-    tmp = gframe("Résultat",container=group)
+    tmp = gframe("Result",container=group)
     resultGroup = glayout(container=tmp)
     resultGroup[2,2] = " x ="
     resultGroup[2,3,expand=TRUE,anchor=c(-1,0)] = .$resultx
@@ -63,7 +66,7 @@
     # buttons
     buttonGroup = ggroup(container=group)
     addSpring(buttonGroup)
-    gbutton("  Afficher  ",container=buttonGroup, handler=.$updatePlot)
+    gbutton(.$translate("Plot"),container=buttonGroup, handler=.$updatePlot)
   
   },
   
@@ -74,47 +77,47 @@
     param3 = eval(parse(text=svalue(.$param3)))
     
     if(is.null(param1)) {
-      gmessage("Spécifiez des valeurs de paramètres.")
+      gmessage(.$translate("Please provide parameter values."))
       return()
     }
     
     distrib = svalue(.$distribution)
-    is1P = distrib %in% c("Student","Chi-2","Poisson")
-    is2P = distrib %in% c("Normale","Chi-2 inverse","Fisher","Binomiale","Gamma","Gamma inverse","Beta")
-    is3P = distrib %in% c("Student non standard","Student non centrale","Chi-2 non centrale","Fisher non centrale","Lambda prime")
+    is1P = distrib %in% .$translate(c("Student","Chi-2","Poisson"))
+    is2P = distrib %in% .$translate(c("Gaussian","Inverse Chi-2","Non central Chi-2","Fisher","Binomial","Gamma","Inverse Gamma","Beta"))
+    is3P = distrib %in% .$translate(c("Generalized Student","Non central Student","Non central Fisher","Lambda prime"))
     
     if(is2P && is.null(param2)) {
-        gmessage("Il manque des valeurs de paramètres.")
+        gmessage(.$translate("Some parameter values are missing."))
         return()
     }
       
     if(is3P && is.null(param3)) {
-        gmessage("Il manque des valeurs de paramètres.")
+        gmessage(.$translate("Some parameter values are missing."))
         return()
     }
       
     value = eval(parse(text=svalue(.$value)))
     
     if(is.null(value)) {
-      gmessage("Spécifiez une valeur.")
+      gmessage(.$translate("Please fill in the value field."))
       return()
     }
 
-    if( (distrib %in% c("Binomiale","Poisson","Chi-2","Chi-2 inverse","Fisher","Gamma","Gamma inverse","Beta"))  && (value < 0))  {
-      gmessage("Cette distribution n\'est pas définie pour les valeurs négatives.")
+    if( (distrib %in% .$translate(c("Binomial","Poisson","Chi-2","Inverse Chi-2","Fisher","Gamma","Inverse Gamma","Beta")))  && (value < 0))  {
+      gmessage(.$translate("This distribution is not defined for negative values."))
       return()  
     }
     
-    isDiscrete = distrib %in% c("Binomiale","Poisson")
+    isDiscrete = distrib %in% c("Binomial","Poisson")
     is01 = function(x) (x>=0)&&(x<=1)
     isInteger = function(x) abs(x)==round(x)
     probf = .$availDists
     
     p = svalue(.$calcWhat,index=T) == 2 # "Probabilité =>  quantile"
-    right = svalue(.$side)=="A droite"
+    right = svalue(.$side)==.$translate("Right-sided")
 
     if(p && !is01(value)) {
-      gmessage("Une probabilité est comprise entre 0 et 1.")
+      gmessage(.$translate("A probability lies between 0 and 1."))
       return()
     }
     
@@ -199,9 +202,9 @@
     if(is2P) {
     
       # Check parameter values
-      if(distrib=="Binomiale") {
+      if(distrib==.$translate("Binomial")) {
         stopifnot(isInteger(param1) && is01(param2)) }
-      if(distrib=="Fisher") {
+      if(distrib==.$translate("Fisher")) {
         stopifnot(isInteger(param1) && isInteger(param2)) }
       
       # prob. to quantile
@@ -247,9 +250,9 @@
       svalue(.$param2)=""
       
       # Check parameter values
-      if(distrib=="Student") {
+      if(distrib==.$translate("Student")) {
         stopifnot(isInteger(param1)) }
-      if(distrib=="Chi-2") {
+      if(distrib==.$translate("Chi-2")) {
         stopifnot(isInteger(param1)) }
       
       # Prob. to quantile
@@ -335,7 +338,7 @@
     
     # Construction du graphique
     xlab="X"
-    title = paste("Distribution :",distrib)
+    title = paste(.$translate("Distribution"),distrib)
     ylab = expression(f(X==x))
     from = 0
     
@@ -344,9 +347,9 @@
     
       # Continuous distribution
       if(!isDiscrete) { 
-        from = ifelse(distrib=="Normale",param1-4*param2,0)
+        from = ifelse(distrib==.$translate("Gaussian"),param1-4*param2,0)
         from = min(from,value,na.rm=TRUE)
-        to = ifelse(distrib=="Normale",param1+4*param2,max(rfunction(1000,param1,param2),na.rm=TRUE))
+        to = ifelse(distrib==.$translate("Gaussian"),param1+4*param2,max(rfunction(1000,param1,param2),na.rm=TRUE))
         to = max(to,value,na.rm=TRUE)
         curve(dfunction(x,param1,param2),n=1000,from=from,to=to,lwd=2,main=title,xlab=xlab,ylab=ylab)
         if(!right) {
@@ -364,7 +367,7 @@
       # Discrete distribution
       else {
         from = 0
-        to = ifelse(distrib=="Binomiale",param1,max(rfunction(1000,param1,param2)))
+        to = ifelse(distrib==.$translate("Binomial"),param1,max(rfunction(1000,param1,param2)))
         z = 0:to
         plot(z,dfunction(z,param1,param2),type="h",lwd=2,main=title,xlab=xlab,ylab=ylab)
         
@@ -386,7 +389,7 @@
       # Continuous distribution
       if(!isDiscrete) {
       
-        from = ifelse(distrib=="Student",min(rfunction(1000,param1)),0)
+        from = ifelse(distrib==.$translate("Student"),min(rfunction(1000,param1)),0)
         from = min(from,value,na.rm=TRUE)
         to = max(rfunction(1000,param1),na.rm=TRUE)
         to = max(to,value,na.rm=TRUE)
@@ -473,10 +476,10 @@
     distrib = svalue(.$distribution)
     param2 = eval(parse(text=svalue(.$param2)))
     
-    is1P = distrib %in% c("Student","Chi-2","Poisson")
-    is2P = distrib %in% c("Normale","Uniforme","Chi-2 inverse","Chi-2 non centrale","Fisher","Binomiale","Gamma","Gamma inverse","Beta")
-    is3P = distrib %in% c("Student non standard","Lambda prime","Student non centrale","Fisher non centrale")
-    
+    is1P = distrib %in% .$translate(c("Student","Chi-2","Poisson"))
+    is2P = distrib %in% .$translate(c("Gaussian","Uniform","Inverse Chi-2","Non central Chi-2","Fisher","Binomial","Gamma","Inverse Gamma","Beta"))
+    is3P = distrib %in% .$translate(c("Generalized Student","Non central Student","Non central Fisher","Lambda prime"))
+        
     # Warning: a droplist may be temporarily set to NULL in gWidgets when changed
     if(is.null(distrib)) return()
     
@@ -508,32 +511,35 @@
     svalue(.$resultx) = ""
     svalue(.$resultp) = ""    
   },
-
+  ### Gettext utility for translating messages
+  translate = function(.,...) {
+    gettext(..., domain="R-AtelieR")
+  },
   #---------------------------------------------------------------------------------------
   #  SLOT                   INITIAL VALUE                          CONTENT
   #---------------------------------------------------------------------------------------
-  availDists   = c(Normale="norm",Uniforme="unif",Binomiale="binom",Poisson="pois",                                  #     Distributions disponibles
-                   Student="t","Student non standard"="nst","Student non centrale"="nct",
-                  "Chi-2"="chisq","Chi-2 inverse"="scaledInvChi2","Chi-2 non centrale"="ncchisq",
-                   Fisher="f","Fisher non centrale"="ncf",
-                   Gamma="gamma","Gamma inverse"="invgamma",
+  availDists   = c(Gaussian="norm",Uniform="unif",Binomial="binom",Poisson="pois",                       #     Available distributions
+                   Student="t","Generalized Student"="nst","Non central Student"="nct",
+                  "Chi-2"="chisq","Inverse Chi-2"="scaledInvChi2","Non central Chi-2"="ncchisq",
+                   Fisher="f","Non central Fisher"="ncf",
+                   Gamma="gamma","Inverse Gamma"="invgamma",
                    Beta="beta","Lambda prime"="lambdaprime"),       
-  paramNames   = list(Uniforme              = c("Borne gauche","Borne droite  ","       "),          #    Noms des paramètres de lois
-                      Binomiale             = c("Effectif    ","Probabilité   ","       "),
-                      Normale               = c("Moyenne     ","Ecart-type    ","       "),
-                      Gamma                 = c("Forme       ","Echelle       ","       "),
-                     "Gamma inverse"        = c("Forme       ","Echelle       ","       "),
-                     "Chi-2"                = c("ddl         ","              ","       "),
-                     "Chi-2 inverse"        = c("ddl         ","Echelle       ","       "),
-                     "Chi-2 non centrale"   = c("ddl         ","Non centralité","       "),
-                      Beta                  = c("alpha       ","beta          ","       "),
-                      Poisson               = c("Moyenne     ","              ","       "),
-                      Student               = c("ddl         ","              ","       "),
-                     "Student non standard" = c("ddl         ","Centre        ","Echelle"),
-                     "Student non centrale" = c("ddl         ","Non-centralité","Echelle"),
-                     "Fisher"               = c("ddl1        ","ddl2          ","       "),
-                     "Fisher non centrale"  = c("ddl1        ","ddl2          ","Non centralité"),
-                     "Lambda prime"         = c("ddl         ","Non-centralité","Echelle")),
+  paramNames   = list(Uniform               = c("Left boundary", "Right boundary", "       "),          #    Parameter names
+                      Binomial              = c("Size         ", "Probability   ", "       "),
+                      Gaussian              = c("Mean         ", "Standard dev. ", "       "),
+                      Gamma                 = c("Shape        ", "Scale         ", "       "),
+                     "Inverse Gamma"        = c("Shape        ", "Scale         ", "       "),
+                     "Chi-2"                = c("df           ", "              ", "       "),
+                     "Inverse Chi-2"        = c("df           ", "Scale         ", "       "),
+                     "Non central Chi-2"    = c("df           ", "Non centrality", "       "),
+                      Beta                  = c("alpha        ", "beta          ", "       "),
+                      Poisson               = c("Mean         ", "              ", "       "),
+                      Student               = c("df           ", "              ", "       "),
+                     "Generalized Student"  = c("df           ", "Center        ", "Scale  "),
+                     "Non central Student"  = c("df           ", "Non centrality", "Scale  "),
+                     "Fisher"               = c("df1          ", "df2           ", "       "),
+                     "Non central Fisher"   = c("df1          ", "df2           ", "Non centrality"),
+                     "Lambda prime"         = c("df           ", "Non centrality", "Scale  ")),
   distribution = NULL,                                 #    Distribution choisie
   calcWhat     = NULL,                                 #    Type de calcul (de quantile à prob. ou l'inverse)
   side         = NULL,                                 #    Cumul à droite ou à gauche

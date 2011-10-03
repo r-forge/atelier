@@ -10,36 +10,36 @@
     if(inherits(try(is.environment(.ws)),"try-error")) return()
     
     # Don't create if already opened
-    if("Changement\nde variable" %in% names(.ws$nb)) return()
+    if(.$translate("Change of origin\nand scale") %in% names(.ws$nb)) return()
     
    .$nobs = gradio(c(50, 500, 50000),handler=.$updatePlot,coerce.with=as.numeric)
    .$param1 = gedit("100",width=5,coerce.with=as.numeric)
    .$param2 = gedit("15",width=5,coerce.with=as.numeric)
    .$add = gedit("0",width=5)
    .$mult = gedit("1",width=5)
-   .$standard = gcheckbox("Standardiser l\'échantillon",handler=.$updatePlot)
+   .$standard = gcheckbox(.$translate("Standardize the sample"),handler=.$updatePlot)
    .$xbar = glabel("")
    .$s = glabel("")
 
     # Construction de l'interface
-    add(.ws$nb,group <- ggroup(horizontal=FALSE),label="Changement\nde variable")
+    add(.ws$nb,group <- ggroup(horizontal=FALSE),label=.$translate("Change of origin\nand scale"))
 
     # Distribution
-    tmp = gframe("Paramètres de population", container = group)
+    tmp = gframe(.$translate("Population parameters"), container = group)
     distribGroup = glayout(container= tmp)
-    distribGroup[2,2:3]=glabel("Loi normale")
-    distribGroup[3,2,anchor=c(-1,0)]=glabel("Moyenne")
+    distribGroup[2,2:3]=glabel("Gaussian distribution")
+    distribGroup[3,2,anchor=c(-1,0)]=glabel("Mean")
     distribGroup[3,3]=.$param1
-    distribGroup[4,2,anchor=c(-1,0)]=glabel("Ecart-type")
+    distribGroup[4,2,anchor=c(-1,0)]=glabel("Standard deviation")
     distribGroup[4,3]=.$param2
     visible(distribGroup)=TRUE
 
     # Effectifs          
-    tmp = gframe("Nombre d\'observations", container = group)
+    tmp = gframe(.$translate("Sample size"), container = group)
     add( tmp,.$nobs)
 
     # Transformation
-    tmp = gframe("Transformation", container = group, horizontal=FALSE)
+    tmp = gframe(.$translate("Transformation"), container = group, horizontal=FALSE)
     transfoGroup = glayout(container= tmp)
     transfoGroup[2,2:3]=glabel(" X' = aX + b ")
     transfoGroup[3,2,anchor=c(-1,0)]=glabel(" a = ")
@@ -50,11 +50,11 @@
     add( tmp,.$standard)
 
     # Statistiques descriptives
-    tmp = gframe("Statistiques descriptives", container = group, horizontal=FALSE)
+    tmp = gframe(.$translate("Descriptive statistics"), container = group, horizontal=FALSE)
     resultGroup = glayout(container= tmp)
-    resultGroup[2,2] = glabel("Moyenne :")
+    resultGroup[2,2] = glabel(.$translate("Mean"))
     resultGroup[2,3] = .$xbar
-    resultGroup[3,2] = glabel("Ecart-type :")
+    resultGroup[3,2] = glabel(.$translate("Standard deviation"))
     resultGroup[3,3] = .$s
 
     addSpring(group)
@@ -62,7 +62,7 @@
     # Boutons de commande
     buttonGroup=ggroup(container=group)
     addSpring(buttonGroup)
-    gbutton(" Echantillonner ",container=buttonGroup, handler=.$updatePlot)
+    gbutton(.$translate("Sample"),container=buttonGroup, handler=.$updatePlot)
 
   },
   
@@ -70,7 +70,7 @@
   
     # Vérification des paramètres
     if(any(is.na(c(svalue(.$param1),svalue(.$param2))))) {
-      gmessage("Spécifiez des valeurs de paramètres.")
+      gmessage(.$translate("Please provide parameter values."))
       return()
     }
 
@@ -103,7 +103,7 @@
     new.sigma = param2*abs(mult)
     
     # Représentation graphique
-    hist(y,xlab="Variable",ylab="Densité",main="Distribution normale",freq=FALSE)
+    hist(y,xlab=.$translate("Variable"),ylab=.$translate("Density"),main=.$translate("Gaussian distribution"),freq=FALSE)
     if(svalue(.$standard)) curve(dnorm(x,0,1),from=-4,to=4,add=TRUE,lwd=2,col="blue")
     else curve(dnorm(x,param1*mult+add,param2*abs(mult)),from=min(y),to=max(y),add=TRUE,lwd=2,col="blue")
     
@@ -114,7 +114,10 @@
     lines(rbind(c(new.mu,dnorm(new.mu+new.sigma,new.mu,new.sigma)),c(new.mu+new.sigma,dnorm(new.mu+new.sigma,new.mu,new.sigma))),col="green",lwd=2)
 
   },
-  
+  ### Gettext utility for translating messages
+  translate = function(.,...) {
+    gettext(..., domain="R-AtelieR")
+  },
   #---------------------------------------------------------------------------------------
   #  SLOT         INITIAL VALUE                  CONTENT
   #---------------------------------------------------------------------------------------

@@ -10,15 +10,15 @@
     if(inherits(try(is.environment(.ws)),"try-error")) return()
     
     # Don't create if already opened
-    if("Inférence bayésienne\nsur plusieurs proportions" %in% names(.ws$nb)) return()
+    if(.$translate("Bayesian inference\non several proportions") %in% names(.ws$nb)) return()
     
    .$betaparam1 = gedit("1",width=15,coerce.with=as.numeric,handler=.$updatePlot)
    .$betaparam2 = gedit("1",width=15,coerce.with=as.numeric,handler=.$updatePlot)
     enabled(.$betaparam1) = FALSE
     enabled(.$betaparam2) = FALSE
 
-    add(.ws$nb,group <- ggroup(horizontal=FALSE),label="Inférence bayésienne\nsur plusieurs proportions")
-    add(group,tmp <- gframe("Loi Beta a priori",horizontal=FALSE))
+    add(.ws$nb,group <- ggroup(horizontal=FALSE),label=.$translate("Bayesian inference\non several proportions"))
+    add(group,tmp <- gframe(.$translate("Beta prior"),horizontal=FALSE))
     priorGroup = glayout(container=tmp)
     priorGroup[2,2,anchor=c(-1,0)]=glabel("a=")
     priorGroup[2,3,anchor=c(-1,0)]=.$betaparam1
@@ -30,11 +30,11 @@
    .$success = gedit("",width=20,handler=.$updatePlot)
    .$Ntot = gedit("",width=20,handler=.$updatePlot)
 
-    add(group,tmp <- gframe("Données observées"))
+    add(group,tmp <- gframe(.$translate("Observed data")))
     dataGroup = glayout(container=tmp)
-    dataGroup[2,2,anchor=c(-1,0)]=glabel("Succès")
+    dataGroup[2,2,anchor=c(-1,0)]=glabel(.$translate("Successes"))
     dataGroup[2,3]=.$success
-    dataGroup[3,2,anchor=c(-1,0)]=glabel("Totaux")
+    dataGroup[3,2,anchor=c(-1,0)]=glabel(.$translate("Total"))
     dataGroup[3,3]=.$Ntot
     dataGroup[4,1]=""
     visible(dataGroup)=TRUE
@@ -44,33 +44,35 @@
    .$bf = glabel("")
    .$possible = glabel("")
    .$postprob = glabel("")
-   .$testAll = gcheckbox("Tout tester",checked=FALSE,handler=.$onTestAll)
+   .$testAll = gcheckbox(.$translate("Test all"),checked=FALSE,handler=.$onTestAll)
    .$bestOne = glabel("")
 
-    add(group,tmp <- gframe("Test d\'hypothèse"))
+    add(group,tmp <- gframe(.$translate("Hypothesis test")))
     testGroup = glayout(container=tmp)
-    testGroup[2,2,anchor=c(-1,0)] = glabel("Modèles possibles")
+    testGroup[2,2,anchor=c(-1,0)] = glabel(.$translate("Possible models"))
     testGroup[2,3] = .$possible
-    testGroup[3,2,anchor=c(-1,0)] = glabel("Modèle cible")
+    testGroup[3,2,anchor=c(-1,0)] = glabel(.$translate("Target model"))
     testGroup[3,3] = .$model
-    testGroup[4,2,anchor=c(-1,0)] = glabel("Pr(M) a priori")
+    testGroup[4,2,anchor=c(-1,0)] = glabel(.$translate("Prior Pr(M)"))
     testGroup[4,3] =.$priorprob
     testGroup[5,3] =.$testAll
-    testGroup[6,2] = glabel("Meilleur modèle")
+    testGroup[6,2] = glabel(.$translate("Best model"))
     testGroup[6,3] =.$bestOne
-    testGroup[7,2] = glabel("Facteur de Bayes")
+    testGroup[7,2] = glabel(.$translate("Bayes Factor"))
     testGroup[7,3] =.$bf
-    testGroup[8,2] = glabel("Pr(M|D)")
+    testGroup[8,2] = glabel(.$translate("Pr(M|D)"))
     testGroup[8,3] =.$postprob
     testGroup[9,1] = ""
     visible(testGroup)=TRUE
 
-    add(group, tmp <- gframe("Estimations a posteriori des modèles"),expand=TRUE)
-    add(tmp,.$postestim <- gtable(cbind(Groupe=rep("",10),Saturé=rep("",10),Cible=rep("",10),Moyennés=rep("",10))),expand=TRUE)
+    add(group, tmp <- gframe(.$translate("Model posterior estimates")),expand=TRUE)
+    est.tab = cbind(Group=rep("",10),Saturated=rep("",10),Target=rep("",10),Averaged=rep("",10))
+    names(est.tab) = .$translate(names(est.tab))
+    add(tmp,.$postestim <- gtable(est.tab),expand=TRUE)
 
     buttonGroup=ggroup(container=group)
     addSpring(buttonGroup)
-    gbutton("  Calculer  ",container=buttonGroup, handler=.$updatePlot)
+    gbutton(.$translate("Compute"),container=buttonGroup, handler=.$updatePlot)
   
   },
   onTestAll = function(.,h,...) {
@@ -84,13 +86,13 @@
 
     # Vérification des paramètres
     if(any(is.na(c(svalue(.$betaparam1),svalue(.$betaparam2))))) {
-      gmessage("Spécifiez des valeurs de paramètres pour la loi Beta a priori.")
+      gmessage(.$translate("Please specify prior parameters."))
       return()
     }
     
     # Vérification des données
     if(any(is.na(c(svalue(.$success),svalue(.$Ntot))))) {
-      gmessage("Indiquez des valeurs observées.")
+      gmessage(.$translate("Please specify observed data."))
       return()
     }
     
@@ -103,7 +105,7 @@
     f = N - s
 
     if( (length(s)<2) || (length(f)<2) || (length(s) != length(f)) ) {
-      gmessage("Spécifiez au moins deux nombres de succès et d'échecs.\nVérifiez qu'il y a autant de valeurs dans les champs 1 et 2")
+      gmessage(.$translate("Please specify at least two counts in each field.\nMake sure there are as many values in both fields."))
       return()
     }
     K = length(s)
@@ -116,11 +118,11 @@
     }
     m = .$getModel()
     if(length(m) != K) {
-      gmessage("Nombre de groupes incorrect dans la définition du modèle.")
+      gmessage(.$translate("Incorrect number of groups in model definition."))
       return()
     }
     
-   .ws$setStatus("Analyse en cours...")
+   .ws$setStatus(.$translate("Estimation in progress..."))
     svalue(.$bestOne) = ""
 
     if(K==2) models = cbind(c(1,1),c(1,2))
@@ -194,16 +196,16 @@
     
     # Graphique
     stats = .$postestim[1:K,]
-    plot(stats$Groupe,stats$Saturé,xlab="Groupes",ylab="Probabilités estimées",ylim=c(0,1),main="",type="n",xaxt="n")
+    plot(stats[,1],stats[,2],xlab=.$translate("Groups"),ylab=.$translate("Probabilités estimées"),ylim=c(0,1),main="",type="n",xaxt="n")
     axis(1,1:K,paste(1:K))
     abline(h=p0,col="lightgrey",lty=2,lwd=2)
-    points(stats$Groupe,stats$Saturé,cex=1.3)
+    points(stats[,1],stats[,2],cex=1.3) # Saturated
     for(k in 1:K) lines(rbind(c(k,qbeta(.025,s[k]+a,f[k]+b)),c(k,qbeta(.975,s[k]+a,f[k]+b))))
-    points(stats$Groupe,stats$Cible,pch=19,col="red")
-    points(stats$Groupe,stats$Moyennés,pch=19,col="blue")
-    legend("topleft",pch=c(1,19,19),col=c("black","red","blue"),legend=c("Saturé","Cible","Moyenné"),inset=.01)
+    points(stats[,1],stats[,3],pch=19,col="red") # Target
+    points(stats[,1],stats[,4],pch=19,col="blue") # Averaged
+    legend("topleft",pch=c(1,19,19),col=c("black","red","blue"),legend=.$translate(c("Saturated","Target","Averaged")),inset=.01)
     
-   .ws$setStatus("Prêt.")
+   .ws$setStatus("Ready.")
   },
   getModel = function(.) {
   
@@ -232,7 +234,10 @@
     log.bf10 = log(N+1) + lchoose(N,K) - sum(lchoose(n,k)) - sum(log(n+1))
     exp(log.bf10)
   },
-
+  ### Gettext utility for translating messages
+  translate = function(.,...) {
+    gettext(..., domain="R-AtelieR")
+  },
   #---------------------------------------------------------------------------------------
   #  SLOT                   INITIAL VALUE                                    CONTENT
   #---------------------------------------------------------------------------------------
