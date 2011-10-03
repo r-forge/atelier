@@ -1,0 +1,551 @@
+# French translations for the AtelieR package
+# Traductions françaises pour le paquet AtelieR
+# Yvonnick Noel, University of Brittany, Rennes, France
+
+msgid ""
+msgstr ""
+"Project-Id-Version: AtelieR-0.2\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-10-03 01:39+0100\n"
+"PO-Revision-Date: 2011-10-03 09:03+0100\n"
+"Last-Translator: Yvonnick Noel <yvonnick.noel@uhb.fr>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+# Window title
+
+msgid  "AtelieR: Statistical workshops in R"
+msgstr "AtelieR : Ateliers de statistiques sous R"
+
+# Menus
+
+msgid  "Session"
+msgstr "Session"
+
+msgid  "Construction of the gaussian distribution"
+msgstr "Construction de la loi normale"
+
+msgid  "Change of origin and scale"
+msgstr "Changement d'origine et d'échelle"
+
+msgid  "Distribution of a sample mean"
+msgstr "Distribution d'une moyenne d'échantillon"
+
+msgid  "Distribution of a sample variance"
+msgstr "Distribution d'une variance d'échantillon"
+
+msgid  "Probability calculator"
+msgstr "Calculateur de probabilités"
+
+msgid  "Bayesian inference on a proportion"
+msgstr "Inférence bayésienne sur une proportion"
+
+msgid  "Bayesian inference on several proportions"
+msgstr "Inférence bayésienne sur plusieurs proportions"
+
+msgid  "Bayesian inference on a contingency table"
+msgstr "Inférence bayésienne sur table de contingence"
+
+msgid  "Bayesian inference on a sample variance"
+msgstr "Inférence bayésienne sur une variance"
+
+msgid  "Bayesian inference on a mean"
+msgstr "Inférence bayésienne sur une moyenne"
+
+msgid  "Bayesian inference on several means"
+msgstr "Inférence bayésienne sur plusieurs moyennes"
+
+# Notebook page labels
+
+msgid  "Construction of the\ngaussian distribution"
+msgstr "Construction de\nla loi normale"
+
+msgid  "Change of origin\nand scale"
+msgstr "Changement d'origine\net d'échelle"
+
+msgid  "Distribution of\na sample mean"
+msgstr "Distribution\nd'une moyenne"
+
+msgid  "Distribution of\na sample variance"
+msgstr "Distribution\nd'une variance"
+
+msgid  "Probability\ncalculator"
+msgstr "Calculateur\nde probabilités"
+
+msgid  "Bayesian inference\non a proportion"
+msgstr "Inférence bayésienne\nsur une proportion"
+
+msgid  "Bayesian inference\non several proportions"
+msgstr "Inférence bayésienne\nsur plusieurs proportions"
+
+msgid  "Bayesian inference\non a contingency table"
+msgstr "Inférence bayésienne\nsur table de contingence"
+
+msgid  "Bayesian inference\non a sample variance"
+msgstr "Inférence bayésienne\nsur une variance"
+
+msgid  "Bayesian inference\non a sample mean"
+msgstr "Inférence bayésienne\nsur une moyenne"
+
+msgid  "Bayesian inference\non several means"
+msgstr "Inférence bayésienne\nsur plusieurs moyennes"
+
+# Construction of the gaussian distribution
+
+msgid  "Counts"
+msgstr "Effectifs"
+
+msgid  "Proportions"
+msgstr "Fréquences"
+
+msgid  "Densities"
+msgstr "Densités"
+
+msgid  "theoretical"
+msgstr "théorique"
+
+msgid  "normale"
+msgstr "gaussian"
+
+msgid  "Distribution"
+msgstr "Distribution"
+
+msgid  "Sample size"
+msgstr "Nombre d'obs."
+
+msgid  "Variables"
+msgstr "Variables"
+
+msgid  "Family"
+msgstr "Loi"
+
+msgid  "Display"
+msgstr "Afficher"
+
+msgid  "Cutpoints"
+msgstr "Coupures"
+
+msgid  "Plot"
+msgstr "Afficher"
+
+msgid  "Please provide parameter values."
+msgstr "Spécifiez des valeurs de paramètres."
+
+msgid  "Binomial"
+msgstr "Binomiale"
+
+msgid  "Uniform"
+msgstr "Uniforme"
+
+msgid  "Gamma"
+msgstr "Gamma"
+
+msgid  "Gaussian"
+msgstr "Normale"
+
+msgid  "Left boundary"
+msgstr "Borne gauche"
+
+msgid  "Right boundary"
+msgstr "Borne droite"
+
+msgid  "Size"
+msgstr "Taille"
+
+msgid  "Probability"
+msgstr "Probabilité"
+
+msgid  "Shape"
+msgstr "Forme"
+
+msgid  "Scale"
+msgstr "Echelle"
+
+msgid  "Mean"
+msgstr "Moyenne"
+
+msgid  "Standard deviation"
+msgstr "Ecart-type"
+
+msgid  "Variable values"
+msgstr "Valeurs de la variable"
+
+msgid  "Values of summed variables"
+msgstr "Valeurs de la variable somme"
+
+msgid  "Standardize the sample"
+msgstr "Standardiser l'échantillon"
+
+msgid  "Population parameters"
+msgstr "Paramètres de population"
+
+msgid  "Transformation"
+msgstr "Transformation"
+
+msgid  "Descriptive statistics"
+msgstr "Statistiques descriptives"
+
+msgid  "Sample"
+msgstr "Echantillonner"
+
+msgid  "Variable"
+msgstr "Variable"
+
+msgid  "Gaussian distribution"
+msgstr "Distribution normale"
+
+msgid  "Density"
+msgstr "Densité"
+
+# Distribution of a sample mean
+
+msgid  "gaussian dist. (means)"
+msgstr "la loi normale (moyennes)"
+
+msgid  "original dist. (scores)"
+msgstr "distribution d'origine (scores)"
+
+msgid  "Samples"
+msgstr "Echantillons"
+
+msgid  "Obs. by sample"
+msgstr "Obs. par éch."
+
+msgid  "Sample mean values"
+msgstr "Valeurs de moyennes d'échantillons"
+
+msgid  "Distribution of means"
+msgstr "Distribution des moyennes"
+
+# Distribution of a sample variance
+
+msgid  "With true mean"
+msgstr "Avec moyenne vraie"
+
+msgid  "With sample mean"
+msgstr "Avec moyenne d'échantillon"
+
+msgid  "Corrected variance"
+msgstr "Variance d'échantillon corrigée"
+
+msgid  "gaussian dist."
+msgstr "la loi normale"
+
+msgid  "Chi-2 dist."
+msgstr "la loi de Chi-2"
+
+msgid  "Gaussian distribution of scores"
+msgstr "Loi normale des scores"
+
+msgid  "Variance computation"
+msgstr "Calcul de la variance"
+
+msgid  "Expected mean"
+msgstr "Espérance"
+
+msgid  "Observed mean"
+msgstr "Moyenne empirique"
+
+msgid  "Distribution of sample variances"
+msgstr "Distribution des variances"
+
+# Probability calculator
+
+msgid  "Quantile    =>  probability"
+msgstr "Quantile    =>  probabilité"
+
+msgid  "probability =>  quantile"
+msgstr "Probabilité =>  quantile"
+
+msgid  "Computation"
+msgstr "Type de calcul"
+
+msgid  "left-sided"
+msgstr "A gauche"
+
+msgid  "Right-sided"
+msgstr "A droite"
+
+msgid  "Cumulative probability"
+msgstr "Probabilité cumulée"
+
+msgid  "Value or expression to compute"
+msgstr "Valeur ou expression à calculer"
+
+msgid  "Result"
+msgstr "Résultat"
+
+msgid  "Student"
+msgstr "Student" 
+
+msgid  "Chi-2"
+msgstr "Chi-2"
+
+msgid  "Poisson"
+msgstr "Poisson"
+
+msgid  "Inverse Chi-2"
+msgstr "Chi-2 inverse" 
+
+msgid  "Fisher"
+msgstr "Fisher" 
+
+msgid  "Inverse Gamma"
+msgstr "Gamma inverse" 
+
+msgid  "Beta"
+msgstr "Beta"
+
+msgid  "Generalized Student"
+msgstr "Student non standard"
+
+msgid  "Non central Student"
+msgstr "Student non centrale" 
+
+msgid  "Non central Chi-2"
+msgstr "Chi-2 non centrale"
+
+msgid  "Non central Fisher"
+msgstr "Fisher non centrale"
+
+msgid  "lambda prime"
+msgstr "Lambda prime"
+
+msgid  "Some parameter values are missing."
+msgstr "Il manque des valeurs de paramètres."
+
+msgid  "Please fill in the value field."
+msgstr "Spécifiez une valeur."
+
+msgid  "This distribution is not defined for negative values."
+msgstr "Cette distribution n'est pas définie pour les valeurs négatives."
+
+msgid  "A probability lies between 0 and 1."
+msgstr "Une probabilité est comprise entre 0 et 1."
+
+msgid  "Standard dev."
+msgstr "Ecart-type"
+
+msgid  "df"
+msgstr "ddl"
+
+msgid  "df1"
+msgstr "ddl1" 
+
+msgid  "df2"
+msgstr "ddl2"
+
+msgid  "Center"
+msgstr "Centre"
+
+msgid  "Non centrality"
+msgstr "Non centralité"
+
+msgid  "alpha"
+msgstr "alpha"
+
+msgid  "beta"
+msgstr "beta"
+
+# Bayesian inference on a proportion
+
+msgid  "Beta prior"
+msgstr "Loi beta a priori"
+
+msgid  "Observed data"
+msgstr "Données observées"
+
+msgid  "Successes"
+msgstr "Succès"
+
+msgid  "Total"
+msgstr "Total"
+
+msgid  "Posterior statistics"
+msgstr "Statistiques a posteriori"
+
+msgid  "Level"
+msgstr "Niveau"
+
+msgid  "Credibility"
+msgstr "Crédibilité"
+
+msgid  "Mode"
+msgstr "Mode"
+
+msgid  "Hypothesis test"
+msgstr "Test d'hypothèse"
+
+msgid  "Prior Pr(H)"
+msgstr "Pr(H) a priori"
+
+msgid  "Bayes factor"
+msgstr "Facteur de Bayes"
+
+msgid  "Pr(H|D)"
+msgstr "Pr(H|D)"
+
+msgid  "Please specifiy prior parameters."
+msgstr "Spécifiez des valeurs de paramètres pour la loi Beta a priori."
+
+msgid  "Please specify observed data."
+msgstr "Indiquez des valeurs observées."
+
+msgid  "Probability of success"
+msgstr "Probabilité du succès"
+
+msgid  "Posterior probability"
+msgstr "Probabilité a posteriori"
+
+msgid  "Prior"
+msgstr "Loi a priori"
+
+msgid  "Likelihood"
+msgstr "Vraisemblance"
+
+msgid  "Posterior"
+msgstr "Loi a Posteriori"
+
+# Bayesian inference of several proportions
+
+msgid  "Test all"
+msgstr "Tout tester"
+
+msgid  "Possible models"
+msgstr "Modèles possibles"
+
+msgid  "Target model"
+msgstr "Modèle cible"
+
+msgid  "Prior Pr(M)"
+msgstr "Pr(M) a priori"
+
+msgid  "Best model"
+msgstr "Meilleur modèle"
+
+msgid  "Pr(M|D)"
+msgstr "Pr(M|D)"
+
+msgid  "Model posterior estimates"
+msgstr "Estimations a posteriori des modèles"
+
+msgid  "Group"
+msgstr "Groupe"
+
+msgid  "Saturated"
+msgstr "Saturé"
+
+msgid  "Cible"
+msgstr "Target"
+
+msgid  "Averaged"
+msgstr "Moyenné"
+
+msgid  "Compute"
+msgstr "Calculer"
+
+msgid  "Please specify at least two counts in each field.\nMake sure there are as many values in both fields."
+msgstr "Spécifiez au moins deux nombres de succès et d'échecs.\nVérifiez qu'il y a autant de valeurs dans les champs 1 et 2"
+
+msgid  "Incorrect number of groups in model definition."
+msgstr "Nombre de groupes incorrect dans la définition du modèle."
+
+msgid  "Estimation in progress..."
+msgstr "Estimation en cours..."
+
+msgid  "Groups"
+msgstr "Groupes"
+
+msgid  "Estimated probabilities"
+msgstr "Probabilités estimées"
+
+msgid  "Ready."
+msgstr "Prêt."
+
+# Bayesian inference on contingency tables
+
+msgid  "Model validation"
+msgstr "Validation de modèle"
+
+msgid  "Prior parameter"
+msgstr "Param. a priori"
+
+msgid  "Model"
+msgstr "Modèle"
+
+msgid  "Please specify a parameter value for the Dirichlet prior."
+msgstr "Spécifiez le paramètre pour la loi\nDirichlet symétrique a priori."
+
+msgid  "Error: All rows in the table should\ncontain the same number of values."
+msgstr "Erreur : toutes les lignes n'ont pas le même nombre de valeurs."
+
+msgid  "Please provide at least two count rows."
+msgstr "Spécifiez au moins deux lignes de comptages."
+
+msgid  "Response"
+msgstr "Réponses"
+
+msgid  "Best"
+msgstr "Meilleur"
+
+msgid  "Homogeneous"
+msgstr "Homogène"
+
+# Bayesian inference on sample variance and mean
+
+msgid  "Gaussian prior"
+msgstr "Loi normale a priori"
+
+msgid  "Prior size"
+msgstr "Effectif a priori"
+
+msgid  "Please provide the observed standard deviation."
+msgstr "Entrez une valeur d'écart-type observé."
+
+msgid  "The prior sample size is too low (0 df.)."
+msgstr "Le paramètre d'effectif a priori est trop faible (0 ddl)."
+
+msgid  "Undefined"
+msgstr "Non défini(e)"
+
+msgid  "Variance"
+msgstr "Variance"
+
+msgid  "Known"
+msgstr "Connu"
+
+msgid  "Estimated"
+msgstr "Estimé"
+
+# Bayesian inference on several means
+
+msgid  "Sample sizes"
+msgstr "Effectifs"
+
+msgid  "Average"
+msgstr "Moyenner"
+
+msgid  "BIC"
+msgstr "BIC"
+
+msgid  "Means"
+msgstr "Moyennes"
+
+msgid  "Inf95"
+msgstr "Inf95"
+
+msgid  "Sup95"
+msgstr "Sup95"
+
+msgid  "Please specify at least two groups.\nMake sure there are as many values in all three fields."
+msgstr "Spécifiez au moins deux groupes.\nVérifiez qu'il y a autant de valeurs dans les 3 champs."
+
+msgid  "Estimated means"
+msgstr "Moyennes estimées"
+
+msgid  "Data"
+msgstr "Données"
+
