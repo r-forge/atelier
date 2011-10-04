@@ -82,7 +82,7 @@
 
     buttonGroup=ggroup(container=group)
     addSpring(buttonGroup)
-    gbutton(.$translate("Display"),container=buttonGroup, handler=.$updatePlot)
+    gbutton(.$translate("Compute"),container=buttonGroup, handler=.$updatePlot)
 
   },
   
@@ -124,6 +124,7 @@
     m0 = eval(parse(text=svalue(.$value)))
     op = svalue(.$op)
     prior.prob = eval(parse(text=svalue(.$priorprob)))
+    post.n = n+prior.n
         
     # Case 1: Variance known
     if(svalue(.$sdFixed)==.$translate("Known")) {
@@ -174,7 +175,6 @@
         gmessage(.$translate("Please provide the observed standard deviation."))
         return()
       }
-      post.n = prior.n + n
       nu0 = prior.n - 1
 
       if(nu0<1) {

@@ -51,14 +51,14 @@
     add(tmp,.$displayFunc)
     add(tmp,.$displayNorm)
 
-    tmp = gframe(.$translate("Coupures"), container = group)
+    tmp = gframe(.$translate("Cutpoints"), container = group)
     add(tmp,.$cutpoints,expand=TRUE)
 
     addSpring(group)
 
     buttonGroup=ggroup(container=group)
     addSpring(buttonGroup)
-    gbutton(.$translate(.$translate("Plot"),container=buttonGroup, handler=.$updatePlot)
+    gbutton(.$translate("Sample"),container=buttonGroup, handler=.$updatePlot)
 
   },
   

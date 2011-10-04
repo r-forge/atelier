@@ -49,7 +49,7 @@
     add(tmp, .$estimNb <- gnotebook(), expand=TRUE)
     add(.$estimNb, tmp <- ggroup(),label=.$translate("Model"),expand=TRUE)
     add(tmp,.$postestim <- gtext("",font.attr=c(family="monospace")),expand=TRUE)
-    add(.$estimNb, tmp <- ggroup(),label="Moyennes",expand=TRUE)
+    add(.$estimNb, tmp <- ggroup(),label=.$translate("Averaged"),expand=TRUE)
     add(tmp,.$avestim <- gtext("",font.attr=c(family="monospace")),expand=TRUE)
     svalue(.$estimNb,index=TRUE) = 1
 
