@@ -1,13 +1,13 @@
 #-----------------------------------------------------------------------------------------
 #
-#                     Yvonnick Noël, U. de Rennes 2, 2007-2011
-#                  Ateliers pédagogiques de simulation statistique
+#               Yvonnick Noel, U. of Brittany, Rennes, France, 2007-2011
+#                        Statistical workshops for teaching
 #
 #-----------------------------------------------------------------------------------------
 
 
 #-----------------------------------------------------------------------------------------
-#                           Construction de l'interface générale
+#                           Construction of main GUI
 #-----------------------------------------------------------------------------------------
 
 .ws = proto(
@@ -17,7 +17,7 @@
      # Interface
     .$window = gwindow(.$translate("AtelieR: Statistical workshops in R"),visible=FALSE)
     .$bigGroup = ggroup(cont = window)
-    .$statusBar = gstatusbar("Prêt.",cont=.$window)
+    .$statusBar = gstatusbar(.$translate("Ready."),cont=.$window)
      add(.$bigGroup,.$nb <- gnotebook(tab.pos=2,closebuttons=TRUE),expand=TRUE)
      add(.$bigGroup,ggraphics())
 

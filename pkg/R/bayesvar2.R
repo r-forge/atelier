@@ -1,5 +1,13 @@
 #-----------------------------------------------------------------------------------------
-#            Inférence bayésienne sur une moyenne (loi a priori informative)
+#
+#               Yvonnick Noel, U. of Brittany, Rennes, France, 2007-2011
+#                        Statistical workshops for teaching
+#
+#-----------------------------------------------------------------------------------------
+
+
+#-----------------------------------------------------------------------------------------
+#            Bayesian inference on the mean (informative prior)
 #-----------------------------------------------------------------------------------------
 
 .ws11 = proto(
@@ -112,7 +120,7 @@
     op = svalue(.$op)
     prior.prob = eval(parse(text=svalue(.$priorprob)))
         
-    # Vérification des paramètres
+    # Check parameters
     if(is.na(svalue(.$s))) {
       gmessage(.$translate("Please provide the observed standard deviation."))
       return()
@@ -125,7 +133,6 @@
       return()
     }
     
-    # dinvgamma = function(z,a,b) (b**a)/gamma(a) * z**(-a-1) * exp(-b/z)
     dinvgamma = function(z,a,b) exp(a*log(b) - lgamma(a) -(a+1)*log(z) -(b/z))
     qinvgamma = function(p,a,b) ifelse(((1 - p) <= .Machine$double.eps),Inf,1/qgamma(1-p,a,b))
     pinvgamma = function(z,a,b) 1-pgamma(1/z,a,b)

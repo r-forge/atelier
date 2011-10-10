@@ -1,5 +1,13 @@
 #-----------------------------------------------------------------------------------------
-#            Inférence bayésienne sur une moyenne (loi a priori informative)
+#
+#               Yvonnick Noel, U. of Brittany, Rennes, France, 2007-2011
+#                        Statistical workshops for teaching
+#
+#-----------------------------------------------------------------------------------------
+
+
+#-----------------------------------------------------------------------------------------
+#               Bayesian inference on the mean (informative prior)
 #-----------------------------------------------------------------------------------------
 .ws8 = proto(
 
@@ -99,13 +107,12 @@
   
   updatePlot = function(.,h,...) {
     
-    # Vérification des paramètres
+    # Check parameters
     if(any(is.na(c(svalue(.$priorn),svalue(.$priorparam1),svalue(.$priorparam2))))) {
       gmessage(.$translate("Please specify prior parameters."))
       return()
     }
     
-    # Vérification des paramètres
     if(any(is.na(c(svalue(.$xbar),svalue(.$n))))) {
       gmessage(.$translate("Please specify observed data."))
       return()
@@ -170,7 +177,7 @@
     # Case 2: Variance unknown
     else {
     
-      # Vérification des paramètres
+      # Check parameters
       if(is.null(s)) {
         gmessage(.$translate("Please provide the observed standard deviation."))
         return()
@@ -237,7 +244,7 @@
       if(op == "H : µ >") z = seq(m0,max(x),len=500)
       else                z = seq(min(x),m0,len=500)        
     }
-    if(svalue(.$sdFixed)==.$translate("Connu")) dz = dnorm(z,post.mean,post.sd)
+    if(svalue(.$sdFixed)==.$translate("Known")) dz = dnorm(z,post.mean,post.sd)
     else                           dz = dt(sqrt(post.n)*(z-post.mean)/scale,nu.n)/(scale/sqrt(post.n))
     polygon(c(z,max(z),min(z)),c(dz,0,0),density=-1,col="lightgrey",lwd=2)
 

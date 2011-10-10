@@ -1,5 +1,13 @@
 #-----------------------------------------------------------------------------------------
-#                  Inférence bayésienne sur plusieurs proportions
+#
+#               Yvonnick Noel, U. of Brittany, Rennes, France, 2007-2011
+#                        Statistical workshops for teaching
+#
+#-----------------------------------------------------------------------------------------
+
+
+#-----------------------------------------------------------------------------------------
+#                       Bayesian inference on a proportion
 #-----------------------------------------------------------------------------------------
 
 .ws9 = proto(
@@ -84,13 +92,13 @@
   },
   updatePlot = function(.,h,...) {
 
-    # Vérification des paramètres
+    # Check parameters
     if(any(is.na(c(svalue(.$betaparam1),svalue(.$betaparam2))))) {
       gmessage(.$translate("Please specify prior parameters."))
       return()
     }
     
-    # Vérification des données
+    # Check data input
     if(any(is.na(c(svalue(.$success),svalue(.$Ntot))))) {
       gmessage(.$translate("Please specify observed data."))
       return()
@@ -110,7 +118,7 @@
     }
     K = length(s)
 
-    # Vérification du modèle
+    # Check model definition
     if(!nchar(svalue(.$model))) {
       svalue(.$model) = paste(1:length(s),collapse=" ")
       # Return or the analysis is performed twice!
@@ -194,15 +202,15 @@
      .$postestim[1:K,4] = round(post.estim,4)
     }
     
-    # Graphique
+    # Plot
     stats = .$postestim[1:K,]
-    plot(stats[,1],stats[,2],xlab=.$translate("Groups"),ylab=.$translate("Probabilités estimées"),ylim=c(0,1),main="",type="n",xaxt="n")
+    plot(stats[,1],stats[,2],xlab=.$translate("Groups"),ylab=.$translate("Estimated probabilities"),ylim=c(0,1),main="",type="n",xaxt="n")
     axis(1,1:K,paste(1:K))
     abline(h=p0,col="lightgrey",lty=2,lwd=2)
-    points(stats[,1],stats[,2],cex=1.3) # Saturated
+    points(stats[,1],stats[,2],cex=1.3)             # Saturated
     for(k in 1:K) lines(rbind(c(k,qbeta(.025,s[k]+a,f[k]+b)),c(k,qbeta(.975,s[k]+a,f[k]+b))))
-    points(stats[,1],stats[,3],pch=19,col="red") # Target
-    points(stats[,1],stats[,4],pch=19,col="blue") # Averaged
+    points(stats[,1],stats[,3],pch=19,col="red")    # Target
+    points(stats[,1],stats[,4],pch=19,col="blue")   # Averaged
     legend("topleft",pch=c(1,19,19),col=c("black","red","blue"),legend=.$translate(c("Saturated","Target","Averaged")),inset=.01)
     
    .ws$setStatus("Ready.")
@@ -225,7 +233,7 @@
 
     list(bf=bf,s=s,f=f)
   },
-  # Facteur de Bayes
+  # Bayes factor
   BF10 = function(.,k,n) {
 
     N = sum(n)
