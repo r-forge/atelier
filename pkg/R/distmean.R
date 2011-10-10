@@ -24,7 +24,7 @@
     names(.$paramNames) = .$translate(names(paramNames))
 
    .$distribution = gdroplist(names(.$availDists),horizontal=FALSE,handler=.$onChangeDist)
-   .$paramLabel1 = glabel(.$translate("Left boudary"))
+   .$paramLabel1 = glabel(.$translate("Left boundary"))
    .$paramLabel2 = glabel(.$translate("Right boundary"))
    .$sampleSize = gradio(c(10,20,50,100),handler=.$updatePlot)
    .$nvar = gradio(c(5,10,50,500),handler=.$updatePlot)

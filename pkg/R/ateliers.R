@@ -35,9 +35,11 @@
      aBayesmean = gaction(label=.$translate("Bayesian inference on a mean"),             handler=.ws8$create)
      aKmeans    = gaction(label=.$translate("Bayesian inference on several means"),      handler=.ws13$create)
      
-     tmp = list(Session  = list(quit=aClose),
-                Ateliers = list(Understand = list(normal=aNormal,scale=aScale,mean=aMean,var=aVar),
-                                Compute    = list(calc=aCalc,prop=aProp,kprop=aKprop,tab=aTable,bvar=aBayesvar,bmean=aBayesmean,km=aKmeans)))
+     tmp = list(Session = list(Quit=aClose),
+                Modules = list(Understand = list(normal=aNormal,scale=aScale,mean=aMean,var=aVar),
+                               Compute    = list(calc=aCalc,prop=aProp,kprop=aKprop,tab=aTable,bvar=aBayesvar,bmean=aBayesmean,km=aKmeans)))
+     names(tmp$Session) = .$translate(names(tmp$Session))
+     names(tmp$Modules) = .$translate(names(tmp$Modules))
      names(tmp) = .$translate(names(tmp))
     .$menu = gmenu(tmp,cont=.$window)
    

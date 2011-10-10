@@ -4,7 +4,7 @@
 
 msgid ""
 msgstr ""
-"Project-Id-Version: AtelieR-0.2\n"
+"Project-Id-Version: AtelieR-0.21\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-10-03 01:39+0100\n"
 "PO-Revision-Date: 2011-10-03 09:03+0100\n"
@@ -24,6 +24,18 @@ msgstr "AtelieR : Ateliers de statistiques sous R"
 
 msgid  "Session"
 msgstr "Session"
+
+msgid  "Modules"
+msgstr "Ateliers"
+
+msgid  "Quit"
+msgstr "Quitter"
+
+msgid  "Understand"
+msgstr "Comprendre"
+
+msgid  "Compute"
+msgstr "Calculer"
 
 msgid  "Construction of the gaussian distribution"
 msgstr "Construction de la loi normale"
@@ -263,7 +275,7 @@ msgstr "Probabilité =>  quantile"
 msgid  "Computation"
 msgstr "Type de calcul"
 
-msgid  "left-sided"
+msgid  "Left-sided"
 msgstr "A gauche"
 
 msgid  "Right-sided"
@@ -443,9 +455,6 @@ msgstr "Target"
 
 msgid  "Averaged"
 msgstr "Moyenné"
-
-msgid  "Compute"
-msgstr "Calculer"
 
 msgid  "Please specify at least two counts in each field.\nMake sure there are as many values in both fields."
 msgstr "Spécifiez au moins deux nombres de succès et d'échecs.\nVérifiez qu'il y a autant de valeurs dans les champs 1 et 2"

@@ -70,7 +70,7 @@
    .$priorprob = gedit("0.5",width=5,handler=.$updatePlot)
    .$bf = glabel("")
    .$postprob = glabel("")
-   .$op = gdroplist(c("H : σ² <","H : σ² =","H : σ² >"),handler=.$updatePlot)
+   .$op = gdroplist(c("H : sigma² <","H : sigma² =","H : sigma² >"),handler=.$updatePlot)
 
     tmp = gframe(.$translate("Hypothesis test"), container = group,expand=TRUE)
     testGroup = glayout(container=tmp)
@@ -78,7 +78,7 @@
     testGroup[2,3]=.$value
     testGroup[3,2,anchor=c(-1,0)]=glabel(.$translate("Prior Pr(H)"))
     testGroup[3,3]=.$priorprob
-    testGroup[4,2]=glabel(.$translate("Bayes Factor"))
+    testGroup[4,2]=glabel(.$translate("Bayes factor"))
     testGroup[4,3]=.$bf
     testGroup[5,2]=glabel(.$translate("Pr(H|D)"))
     testGroup[5,3]=.$postprob
@@ -164,7 +164,7 @@
       BF = dscaledInvChi2(m0,nu0,prior.var)/dscaledInvChi2(m0,nu.n,s2.n)
       post.prob = prior.prob * BF/(prior.prob * BF + 1 - prior.prob)
       
-      if(op != "H : σ² =") {
+      if(op != "H : sigma² =") {
         priorH = pscaledInvChi2(m0,nu0,prior.var)
         priorA = 1 - priorH
         prior.odds = priorH/priorA
@@ -173,7 +173,7 @@
         post.odds = postH/postA
         BF = post.odds/prior.odds
         post.prob = postH
-        if(op=="H : σ² >") { BF = 1/BF ; post.prob = postA }
+        if(op=="H : sigma² >") { BF = 1/BF ; post.prob = postA }
       }        
 
       svalue(.$bf) = round(BF,4)
@@ -195,8 +195,8 @@
     z = seq(q1,q2,len=500)
 
     # One-sided regions
-    if(!is.null(m0) && (op != "H : mu =")) {  
-      if(op == "H : σ² >") z = seq(m0,max(x),len=500)
+    if(!is.null(m0) && (op != "H : sigma² =")) {  
+      if(op == "H : sigma² >") z = seq(m0,max(x),len=500)
       else                 z = seq(min(x),m0,len=500)        
     }
 

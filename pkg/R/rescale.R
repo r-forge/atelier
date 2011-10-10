@@ -35,10 +35,10 @@
     # Distribution
     tmp = gframe(.$translate("Population parameters"), container = group)
     distribGroup = glayout(container= tmp)
-    distribGroup[2,2:3]=glabel("Gaussian distribution")
-    distribGroup[3,2,anchor=c(-1,0)]=glabel("Mean")
+    distribGroup[2,2:3]=glabel(.$translate("Gaussian distribution"))
+    distribGroup[3,2,anchor=c(-1,0)]=glabel(.$translate("Mean"))
     distribGroup[3,3]=.$param1
-    distribGroup[4,2,anchor=c(-1,0)]=glabel("Standard deviation")
+    distribGroup[4,2,anchor=c(-1,0)]=glabel(.$translate("Standard dev."))
     distribGroup[4,3]=.$param2
     visible(distribGroup)=TRUE
 

@@ -72,7 +72,7 @@
    .$priorprob = gedit("0.5",width=5,handler=.$updatePlot)
    .$bf = glabel("")
    .$postprob = glabel("")
-   .$op = gdroplist(c("H : µ <","H : µ =","H : µ >"),handler=.$updatePlot)
+   .$op = gdroplist(c("H : mu <","H : mu =","H : mu >"),handler=.$updatePlot)
 
     tmp = gframe(.$translate("Hypothesis test"), container = group,expand=TRUE)
     testGroup = glayout(container=tmp)
@@ -80,7 +80,7 @@
     testGroup[2,3]=.$value
     testGroup[3,2,anchor=c(-1,0)]=glabel(.$translate("Prior Pr(H)"))
     testGroup[3,3]=.$priorprob
-    testGroup[4,2]=glabel(.$translate("Bayes Factor"))
+    testGroup[4,2]=glabel(.$translate("Bayes factor"))
     testGroup[4,3]=.$bf
     testGroup[5,2]=glabel(.$translate("Pr(H|D)"))
     testGroup[5,3]=.$postprob
@@ -158,7 +158,7 @@
         post.prob = prior.prob * BF/(prior.prob * BF + 1 - prior.prob)
         
         # One-sided test
-        if(op != "H : µ =") {
+        if(op != "H : mu =") {
           priorH = pnorm(m0, prior.mean, prior.sd/sqrt(prior.n))
           priorA = 1 - priorH
           prior.odds = priorH/priorA
@@ -167,7 +167,7 @@
           post.odds = postH/postA
           BF = post.odds/prior.odds
           post.prob = postH
-          if(op=="H : µ >") { BF = 1/BF     ; post.prob = postA }
+          if(op=="H : mu >") { BF = 1/BF     ; post.prob = postA }
         }
         svalue(.$bf) = round(BF,4)
         svalue(.$postprob) = round(post.prob,4)
@@ -213,7 +213,7 @@
         BF = (dt(sqrt(prior.n)*(m0-prior.mean)/prior.sd,nu0)/(prior.sd/sqrt(prior.n)))/(dt(sqrt(post.n)*(m0-post.mean)/scale,nu.n)/(scale/sqrt(post.n)))
         post.prob = prior.prob * BF/(prior.prob * BF + 1 - prior.prob)
         
-        if(op != "H : µ =") {
+        if(op != "H : mu =") {
           priorH = pt(sqrt(prior.n)*(m0-prior.mean)/prior.sd,nu0)
           priorA = 1 - priorH
           prior.odds = priorH/priorA
@@ -222,7 +222,7 @@
           post.odds = postH/postA
           BF = post.odds/prior.odds
           post.prob = postH
-          if(op=="H : µ >") { BF = 1/BF     ; post.prob = postA }
+          if(op=="H : mu >") { BF = 1/BF     ; post.prob = postA }
         }        
 
       svalue(.$bf) = round(BF,4)
@@ -240,8 +240,8 @@
     z = seq(q1,q2,len=500)
 
     # One-sided regions
-    if(!is.null(m0) && (op != "H : µ =")) {  
-      if(op == "H : µ >") z = seq(m0,max(x),len=500)
+    if(!is.null(m0) && (op != "H : mu =")) {  
+      if(op == "H : mu >") z = seq(m0,max(x),len=500)
       else                z = seq(min(x),m0,len=500)        
     }
     if(svalue(.$sdFixed)==.$translate("Known")) dz = dnorm(z,post.mean,post.sd)

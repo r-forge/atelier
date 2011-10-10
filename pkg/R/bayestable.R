@@ -46,7 +46,7 @@
     testGroup[6,3] =.$testAll
     testGroup[7,2] = glabel(.$translate("Best model"))
     testGroup[7,3] =.$bestOne
-    testGroup[8,2] = glabel(.$translate("Bayes Factor"))
+    testGroup[8,2] = glabel(.$translate("Bayes factor"))
     testGroup[8,3] =.$bf
     testGroup[9,2] = glabel(.$translate("Pr(M|D)"))
     testGroup[9,3] =.$postprob
