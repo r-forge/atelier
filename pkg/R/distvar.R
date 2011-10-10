@@ -68,7 +68,7 @@
 
     buttonGroup=ggroup(container=group)
     addSpring(buttonGroup)
-    gbutton("Sample",container=buttonGroup, handler=.$updatePlot)
+    gbutton(.$translate("Sample"),container=buttonGroup, handler=.$updatePlot)
   },
   
   updatePlot = function(.,h,...) {

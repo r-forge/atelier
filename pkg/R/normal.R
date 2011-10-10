@@ -21,7 +21,13 @@
     if(.$translate("Construction of the\ngaussian distribution") %in% names(.ws$nb)) return()
     
     names(.$availDists) = .$translate(names(availDists))
-    names(.$paramNames) = .$translate(names(paramNames))
+
+   .$paramNames$Binomial = .$translate(paramNames$Binomial)
+   .$paramNames$Uniform  = .$translate(paramNames$Uniform)
+   .$paramNames$Gaussian = .$translate(paramNames$Gaussian)
+   .$paramNames$Gamma    = .$translate(paramNames$Gamma)
+   
+    names(.$paramNames)  = .$translate(names(paramNames))
 
    .$distribution = gdroplist(names(.$availDists),horizontal=FALSE,handler=.$updateParamNames)
    .$sampleSize = gradio(c(500, 1000, 5000, 50000),handler=.$updatePlot,coerce.with=as.numeric)
@@ -157,7 +163,7 @@
   #  SLOT                   INITIAL VALUE                                    CONTENT
   #---------------------------------------------------------------------------------------
   availDists     = c(Uniform = "unif", Binomial = "binom", Gaussian = "norm", Gamma = "gamma"),
-  paramNames     = list(Uniform=c("Left boudary","Right boundary"),Binomial=c("Size","Probability"),Gaussian=c("Mean","Standard deviation"),Gamma=c("Shape","Scale")),
+  paramNames     = list(Uniform=c("Left boundary","Right boundary"),Binomial=c("Size","Probability"),Gaussian=c("Mean","Standard dev."),Gamma=c("Shape","Scale")),
   distribution   = NULL,
   sampleSize     = NULL,
   nvar           = NULL,

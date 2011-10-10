@@ -21,6 +21,24 @@
     if(.$translate("Probability\ncalculator") %in% names(.ws$nb)) return()
     
     names(.$availDists) = .$translate(names(availDists))
+    
+   .$paramNames$Uniform               = .$translate(.$paramNames$Uniform)
+   .$paramNames$Binomial              = .$translate(.$paramNames$Binomial)
+   .$paramNames$Gaussian              = .$translate(.$paramNames$Gaussian)
+   .$paramNames$Gamma                 = .$translate(.$paramNames$Gamma)
+   .$paramNames$"Inverse Gamma"       = .$translate(.$paramNames$"Inverse Gamma")
+   .$paramNames$"Chi-2"               = .$translate(.$paramNames$"Chi-2")
+   .$paramNames$"Inverse Chi-2"       = .$translate(.$paramNames$"Inverse Chi-2")
+   .$paramNames$"Non central Chi-2"   = .$translate(.$paramNames$"Non central Chi-2")
+   .$paramNames$Beta                  = .$translate(.$paramNames$Beta)
+   .$paramNames$Poisson               = .$translate(.$paramNames$Poisson)
+   .$paramNames$Student               = .$translate(.$paramNames$Student)
+   .$paramNames$"Generalized Student" = .$translate(.$paramNames$"Generalized Student")
+   .$paramNames$"Non central Student" = .$translate(.$paramNames$"Non central Student")
+   .$paramNames$Fisher                = .$translate(.$paramNames$Fisher)
+   .$paramNames$"Non central Fisher"  = .$translate(.$paramNames$"Non central Fisher")
+   .$paramNames$"Lambda prime"        = .$translate(.$paramNames$"Lambda prime")
+
     names(.$paramNames) = .$translate(names(paramNames))
 
    .$distribution = gdroplist(names(.$availDists),horizontal=FALSE,handler=.$initOptions)
@@ -47,7 +65,7 @@
     distribGroup[5,3]=.$param3
     visible(distribGroup)=TRUE
 
-   .$calcWhat = gradio(.$translate(c("Quantile    =>  probability","Probability =>  quantile")),handler=.$updatePlot)
+   .$calcWhat = gradio(.$translate(c("Quantile => probability","Probability => quantile")),handler=.$updatePlot)
     tmp = gframe(.$translate("Computation"),container=group)
     add(tmp,.$calcWhat)
 
@@ -62,7 +80,7 @@
     tmp = gframe(.$translate("Value or expression to compute"),container=group)
     add(tmp,.$value,expand=TRUE)
 
-    tmp = gframe("Result",container=group)
+    tmp = gframe(.$translate("Result"),container=group)
     resultGroup = glayout(container=tmp)
     resultGroup[2,2] = " x ="
     resultGroup[2,3,expand=TRUE,anchor=c(-1,0)] = .$resultx

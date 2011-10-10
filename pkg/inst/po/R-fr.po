@@ -64,7 +64,7 @@ msgstr "Inférence bayésienne sur table de contingence"
 msgid  "Bayesian inference on a sample variance"
 msgstr "Inférence bayésienne sur une variance"
 
-msgid  "Bayesian inference on a mean"
+msgid  "Bayesian inference on a sample mean"
 msgstr "Inférence bayésienne sur une moyenne"
 
 msgid  "Bayesian inference on several means"
@@ -119,8 +119,8 @@ msgstr "Densités"
 msgid  "theoretical"
 msgstr "théorique"
 
-msgid  "normale"
-msgstr "gaussian"
+msgid  "gaussian"
+msgstr "normale"
 
 msgid  "Distribution"
 msgstr "Distribution"
@@ -265,12 +265,11 @@ msgid  "Distribution of sample variances"
 msgstr "Distribution des variances"
 
 # Probability calculator
+msgid  "Quantile => probability"
+msgstr "Quantile => probabilité"
 
-msgid  "Quantile    =>  probability"
-msgstr "Quantile    =>  probabilité"
-
-msgid  "probability =>  quantile"
-msgstr "Probabilité =>  quantile"
+msgid  "Probability => quantile"
+msgstr "Probabilité => quantile"
 
 msgid  "Computation"
 msgstr "Type de calcul"

@@ -21,6 +21,11 @@
     if(.$translate("Distribution of\na sample mean") %in% names(.ws$nb)) return()
     
     names(.$availDists) = .$translate(names(availDists))
+    
+   .$paramNames$Uniform               = .$translate(.$paramNames$Uniform)
+   .$paramNames$Binomial              = .$translate(.$paramNames$Binomial)
+   .$paramNames$Gaussian              = .$translate(.$paramNames$Gaussian)
+
     names(.$paramNames) = .$translate(names(paramNames))
 
    .$distribution = gdroplist(names(.$availDists),horizontal=FALSE,handler=.$onChangeDist)
@@ -67,7 +72,7 @@
     resGroup[2,3] = .$xbar
     resGroup[3,2,anchor=c(-1,0)]=glabel(.$translate("Variance"))
     resGroup[3,3] = .$var
-    resGroup[4,2,anchor=c(-1,0)]=glabel(.$translate("Standard deviation"))
+    resGroup[4,2,anchor=c(-1,0)]=glabel(.$translate("Standard dev."))
     resGroup[4,3] = .$s
 
     addSpring(group)
@@ -127,18 +132,18 @@
     title = .$translate("Distribution of means")
     ylab =  .$translate("Densities")
     
-    if(distrib=="Uniform") {
+    if(distrib==.$translate("Uniform")) {
       hist(y,freq=FALSE,main=title,xlab=xlab,ylab=ylab,xlim=xlim)
       if(plotDens) abline(h=(1/(param2-param1)),col="red")
     }
     
-    else if(distrib=="Gaussian") {
+    else if(distrib==.$translate("Gaussian")) {
       hist(y,freq=FALSE,main=title,xlab=xlab,ylab=ylab,xlim=xlim)
       if(plotDens) curve(dnorm(x,param1,param2),from=xlim[1],to=xlim[2],add=TRUE,lwd=2,col=2)
     }
     
     # Binomiale
-    else if(distrib=="Binomial") {
+    else if(distrib==.$translate("Binomial")) {
       res = plot((nobs*table(y))/nsamp,main=title,xlab=xlab,ylab=ylab,xlim=xlim)
       if(plotDens) lines(0.01+(0:param1),dbinom(0:param1,param1,param2),col="red",type="h")
     }

@@ -31,8 +31,8 @@
      aProp      = gaction(label=.$translate("Bayesian inference on a proportion"),       handler=.ws6$create)
      aKprop     = gaction(label=.$translate("Bayesian inference on several proportions"),handler=.ws9$create)
      aTable     = gaction(label=.$translate("Bayesian inference on a contingency table"),handler=.ws10$create)
-     aBayesvar  = gaction(label=.$translate("Bayesian inference on a variance"),         handler=.ws11$create)
-     aBayesmean = gaction(label=.$translate("Bayesian inference on a mean"),             handler=.ws8$create)
+     aBayesvar  = gaction(label=.$translate("Bayesian inference on a sample variance"),         handler=.ws11$create)
+     aBayesmean = gaction(label=.$translate("Bayesian inference on a sample mean"),             handler=.ws8$create)
      aKmeans    = gaction(label=.$translate("Bayesian inference on several means"),      handler=.ws13$create)
      
      tmp = list(Session = list(Quit=aClose),
