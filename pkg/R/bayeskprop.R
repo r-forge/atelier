@@ -66,7 +66,7 @@
     testGroup[5,3] =.$testAll
     testGroup[6,2] = glabel(.$translate("Best model"))
     testGroup[6,3] =.$bestOne
-    testGroup[7,2] = glabel(.$translate("Bayes Factor"))
+    testGroup[7,2] = glabel(.$translate("Bayes factor"))
     testGroup[7,3] =.$bf
     testGroup[8,2] = glabel(.$translate("Pr(M|D)"))
     testGroup[8,3] =.$postprob
@@ -75,8 +75,8 @@
 
     add(group, tmp <- gframe(.$translate("Model posterior estimates")),expand=TRUE)
     est.tab = cbind(Group=rep("",10),Saturated=rep("",10),Target=rep("",10),Averaged=rep("",10))
-    names(est.tab) = .$translate(names(est.tab))
     add(tmp,.$postestim <- gtable(est.tab),expand=TRUE)
+    names(.$postestim) = .$translate(names(.$postestim))
 
     buttonGroup=ggroup(container=group)
     addSpring(buttonGroup)

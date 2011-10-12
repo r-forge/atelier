@@ -449,8 +449,8 @@ msgstr "Groupe"
 msgid  "Saturated"
 msgstr "Saturé"
 
-msgid  "Cible"
-msgstr "Target"
+msgid  "Target"
+msgstr "Cible"
 
 msgid  "Averaged"
 msgstr "Moyenné"
