@@ -8,7 +8,11 @@
 \alias{.ws4}
 \alias{.ws5}
 \alias{.ws6}
-\alias{.ws7}
+\alias{.ws8}
+\alias{.ws9}
+\alias{.ws10}
+\alias{.ws11}
+\alias{.ws13}
 \description{Internal AtelieR objects.}
 \details{These are not to be called by the user.}
 \keyword{internal}
