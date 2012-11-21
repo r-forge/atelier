@@ -47,7 +47,8 @@
     dataGroup[4,1]=""
     visible(dataGroup)=TRUE
 
-   .$priorprob = gedit("",width=5,handler=.$updatePlot)
+   .$priorprob = gedit("")
+   .$handler.ID['changePriorProb'] = addhandlerchanged(.$priorprob,.$updatePlot)
    .$model = gedit("",width=15,handler=.$updatePlot)
    .$bf = glabel("")
    .$possible = glabel("")
@@ -116,6 +117,12 @@
       gmessage(.$translate("Please specify at least two counts in each field.\nMake sure there are as many values in both fields."))
       return()
     }
+
+    if( (length(a)>1) || (length(b)>1) ) {
+      gmessage(.$translate("Please specify a single prior parameter value in each field."))
+      return()
+    }
+    
     K = length(s)
 
     # Check model definition
@@ -133,29 +140,31 @@
    .ws$setStatus(.$translate("Estimation in progress..."))
     svalue(.$bestOne) = ""
 
+    # Only two groups -> two models
     if(K==2) models = cbind(c(1,1),c(1,2))
+    
+    # More than two groups
     else     models = setparts(K)
     nmodels = ncol(models)
     svalue(.$possible) = paste(nmodels)
 
-    # Bayesian test
-    priorprob = eval(parse(text=svalue(.$priorprob)))
-    if(is.null(priorprob)) {
-      svalue(.$priorprob) = paste("1/",nmodels,sep="")
-      # Return or the analysis is performed twice!
-      return()
-    }
+    p0 = (sum(s)+a)/(sum(s+f)+a+b)
 
-    p0 = (sum(s)+1)/(sum(s+f)+2)
-
+    # Test all possible models
     if(svalue(.$testAll)) {
     
-      # All possible models
+      # Equal prior probs in this case
+      blockhandler(.$priorprob,.$handler.ID['changePriorProb'])
+      svalue(.$priorprob) = paste("1/",nmodels,sep="")
+      unblockhandler(.$priorprob,.$handler.ID['changePriorProb'])
+
+      priorprob = 1/nmodels
+
       results = matrix(0,0,K+1)
-      group.names=paste(1:K)
+      group.names = paste(1:K)
       for(i in 1:ncol(models)) {
         test = .$testModel(s,f,models[,i])
-        est = (test$s+1)/(test$s+test$f+2)
+        est = (test$s+a)/(test$s+test$f+a+b)
         results = rbind(results,c(est,test$bf))
         model.name = tapply(group.names,models[,i],paste,collapse=",")
         model.name = paste(sapply(model.name,function(x) paste("(",x,")",sep="")),collapse=",")
@@ -166,15 +175,16 @@
       
       # Best model
       best.one = which.max(results[,"Prob"])
+      test = .$testModel(s,f,models[,best.one])
       svalue(.$bestOne) = rownames(results)[best.one]
       best.bf = results[best.one,"BF"]
-      post.prob = priorprob * best.bf/(priorprob * best.bf + 1 - priorprob)
+      post.prob = results[best.one,"Prob"]
       best.estim = results[best.one,1:K]
       svalue(.$bf) = round(best.bf,4)
       svalue(.$postprob) = round(post.prob,4)
 
       # A posteriori model averaged estimations (Viana, 1991)
-      psat = (s+1)/(s+f+2)
+      psat = (s+a)/(s+f+a+b)
       post.estim = colSums(results[,"Prob"]*results[,1:K])
 
      .$postestim[,] = matrix("",10,4)
@@ -184,6 +194,19 @@
      .$postestim[1:K,4] = round(post.estim,4)
     }
     else {
+
+      priorprob = eval(parse(text=svalue(.$priorprob)))
+
+      if(is.null(priorprob)) {
+        blockhandler(.$priorprob,.$handler.ID['changePriorProb'])
+        svalue(.$priorprob) = "1/2"
+        unblockhandler(.$priorprob,.$handler.ID['changePriorProb'])
+        priorprob = .5
+      }
+      
+      # Convert model symbols in integers if letters were supplied
+      if(all(m %in% letters)) m = match(tolower(m),letters)
+    
       test = .$testModel(s,f,m)
       post.prob = priorprob * test$bf/(priorprob * test$bf + 1 - priorprob)
       
@@ -191,8 +214,8 @@
       svalue(.$postprob) = paste(round(post.prob,4))
 
       # A posteriori model averaged estimations (Viana, 1991)
-      psat = (s+1)/(s+f+2)
-      p1 = (test$s+1)/(test$s+test$f+2)
+      psat = (s+a)/(s+f+a+b)
+      p1 = (test$s+a)/(test$s+test$f+a+b)
       post.estim = post.prob*p1 + (1-post.prob)*p0
 
      .$postestim[,] = matrix("",10,4)
@@ -208,12 +231,12 @@
     axis(1,1:K,paste(1:K))
     abline(h=p0,col="lightgrey",lty=2,lwd=2)
     points(stats[,1],stats[,2],cex=1.3)             # Saturated
-    for(k in 1:K) lines(rbind(c(k,qbeta(.025,s[k]+a,f[k]+b)),c(k,qbeta(.975,s[k]+a,f[k]+b))))
+    for(k in 1:K) lines(rbind(c(k,qbeta(.025,test$s[k]+a,test$f[k]+b)),c(k,qbeta(.975,test$s[k]+a,test$f[k]+b))))
     points(stats[,1],stats[,3],pch=19,col="red")    # Target
     points(stats[,1],stats[,4],pch=19,col="blue")   # Averaged
     legend("topleft",pch=c(1,19,19),col=c("black","red","blue"),legend=.$translate(c("Saturated","Target","Averaged")),inset=.01)
     
-   .ws$setStatus("Ready.")
+   .ws$setStatus(.$translate("Ready."))
   },
   getModel = function(.) {
   
@@ -249,8 +272,9 @@
   #---------------------------------------------------------------------------------------
   #  SLOT                   INITIAL VALUE                                    CONTENT
   #---------------------------------------------------------------------------------------
-  betaparam1   =  NULL,                #
-  betaparam2   =  NULL,                #
+  handler.ID   = list(),               # IDs of various handlers that may have to be blocked
+  betaparam1   =  NULL,                # First parameter of the beta prior (default 1)
+  betaparam2   =  NULL,                # Second parameter of the beta prior (default 1)
   success      =  NULL,                #
   Ntot         =  NULL,                #
   priorprob    =  NULL,                #

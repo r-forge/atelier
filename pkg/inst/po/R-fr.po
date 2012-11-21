@@ -25,17 +25,14 @@ msgstr "AtelieR : Ateliers de statistiques sous R"
 msgid  "Session"
 msgstr "Session"
 
-msgid  "Modules"
-msgstr "Ateliers"
-
 msgid  "Quit"
 msgstr "Quitter"
 
+msgid  "Modules"
+msgstr "Ateliers"
+
 msgid  "Understand"
 msgstr "Comprendre"
-
-msgid  "Compute"
-msgstr "Calculer"
 
 msgid  "Construction of the gaussian distribution"
 msgstr "Construction de la loi normale"
@@ -49,26 +46,50 @@ msgstr "Distribution d'une moyenne d'échantillon"
 msgid  "Distribution of a sample variance"
 msgstr "Distribution d'une variance d'échantillon"
 
+msgid  "Compute"
+msgstr "Calculer"
+
 msgid  "Probability calculator"
 msgstr "Calculateur de probabilités"
 
-msgid  "Bayesian inference on a proportion"
-msgstr "Inférence bayésienne sur une proportion"
+msgid  "Bayesian inference"
+msgstr "Inférence bayésienne"
 
-msgid  "Bayesian inference on several proportions"
-msgstr "Inférence bayésienne sur plusieurs proportions"
+msgid  "On a proportion"
+msgstr "Sur une proportion"
 
-msgid  "Bayesian inference on a contingency table"
-msgstr "Inférence bayésienne sur table de contingence"
+msgid  "On several proportions"
+msgstr "Sur plusieurs proportions"
 
-msgid  "Bayesian inference on a sample variance"
-msgstr "Inférence bayésienne sur une variance"
+msgid  "On a categorical distribution"
+msgstr "Sur une distribution catégorisée"
 
-msgid  "Bayesian inference on a sample mean"
-msgstr "Inférence bayésienne sur une moyenne"
+msgid  "On a contingency table"
+msgstr "Sur table de contingence"
 
-msgid  "Bayesian inference on several means"
-msgstr "Inférence bayésienne sur plusieurs moyennes"
+msgid  "On a sample variance"
+msgstr "Sur une variance"
+
+msgid  "On a sample mean"
+msgstr "Sur une moyenne"
+
+msgid  "On both a mean and a variance"
+msgstr "Sur moyenne et variance"
+
+msgid  "On a standardized effect"
+msgstr "Sur un effet standardisé"
+
+msgid  "On two means"
+msgstr "Sur deux moyennes"
+
+msgid  "On several means"
+msgstr "Sur plusieurs moyennes"
+
+msgid  "Help"
+msgstr "Aide"
+
+msgid  "About..."
+msgstr "A propos de..."
 
 # Notebook page labels
 
@@ -93,6 +114,9 @@ msgstr "Inférence bayésienne\nsur une proportion"
 msgid  "Bayesian inference\non several proportions"
 msgstr "Inférence bayésienne\nsur plusieurs proportions"
 
+msgid  "Bayesian inference\non a categorical distribution"
+msgstr "Inférence bayésienne\nsur une distribution categorisée"
+
 msgid  "Bayesian inference\non a contingency table"
 msgstr "Inférence bayésienne\nsur table de contingence"
 
@@ -101,6 +125,15 @@ msgstr "Inférence bayésienne\nsur une variance"
 
 msgid  "Bayesian inference\non a sample mean"
 msgstr "Inférence bayésienne\nsur une moyenne"
+
+msgid  "Bayesian inference\non mean and variance"
+msgstr "Inférence bayésienne\nsur moyenne et variance"
+
+msgid  "Bayesian inference\non a standardized effect"
+msgstr "Inférence bayésienne\nsur effet standardisé"
+
+msgid  "Bayesian inference\non two means"
+msgstr "Inférence bayésienne\nsur deux moyennes"
 
 msgid  "Bayesian inference\non several means"
 msgstr "Inférence bayésienne\nsur plusieurs moyennes"
@@ -265,6 +298,7 @@ msgid  "Distribution of sample variances"
 msgstr "Distribution des variances"
 
 # Probability calculator
+
 msgid  "Quantile => probability"
 msgstr "Quantile => probabilité"
 
@@ -399,10 +433,10 @@ msgstr "Facteur de Bayes"
 msgid  "Pr(H|D)"
 msgstr "Pr(H|D)"
 
-msgid  "Please specifiy prior parameters."
-msgstr "Spécifiez des valeurs de paramètres pour la loi Beta a priori."
+msgid  "Please specifiy all prior parameters."
+msgstr "Spécifiez des valeurs de paramètres pour la loi a priori."
 
-msgid  "Please specify observed data."
+msgid  "Please specify observed data statistics."
 msgstr "Indiquez des valeurs observées."
 
 msgid  "Probability of success"
@@ -441,7 +475,7 @@ msgid  "Pr(M|D)"
 msgstr "Pr(M|D)"
 
 msgid  "Model posterior estimates"
-msgstr "Estimations a posteriori des modèles"
+msgstr "Estimations a posteriori du modèle"
 
 msgid  "Group"
 msgstr "Groupe"
@@ -472,6 +506,20 @@ msgstr "Probabilités estimées"
 
 msgid  "Ready."
 msgstr "Prêt."
+
+# Bayesian inference on a categorical distribution
+
+msgid  "Dirichlet prior"
+msgstr "Loi Dirichlet a priori"
+
+msgid  "Levels"
+msgstr "Modalités"
+
+msgid  "Please specify at least two counts."
+msgstr "Spécifiez au moins deux effectifs."
+
+msgid  "Please specify a single prior parameter value in each field."
+msgstr "Spécifiez une unique valeur de paramètre a priori dans chaque champ."
 
 # Bayesian inference on contingency tables
 
@@ -513,8 +561,8 @@ msgstr "Effectif a priori"
 msgid  "Please provide the observed standard deviation."
 msgstr "Entrez une valeur d'écart-type observé."
 
-msgid  "The prior sample size is too low (0 df.)."
-msgstr "Le paramètre d'effectif a priori est trop faible (0 ddl)."
+msgid  "The prior sample size is too low."
+msgstr "Paramètre d'effectif a priori trop faible."
 
 msgid  "Undefined"
 msgstr "Non défini(e)"
@@ -528,7 +576,21 @@ msgstr "Connu"
 msgid  "Estimated"
 msgstr "Estimé"
 
+# Bayesian inference on a standardized effect
+
+msgid  "Standard effect"
+msgstr "Effet standard"
+
+msgid  "Please provide a reference mean in the data section."
+msgstr "Entrez une valeur de moyenne de référence dans la section de données."
+
+msgid  "Please provide a normative value in the test section."
+msgstr "Entrez une valeur de norme dans la section de test."
+
 # Bayesian inference on several means
+
+msgid  "Homogeneity of variances"
+msgstr "Homogénéité des variances"
 
 msgid  "Sample sizes"
 msgstr "Effectifs"

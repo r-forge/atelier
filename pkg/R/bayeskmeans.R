@@ -37,9 +37,13 @@
     dataGroup[5,1]= ""
     visible(dataGroup) = TRUE
 
-   .$priorprob = gedit("",width=5,handler=.$updatePlot)
-   .$model = gedit("",width=15,handler=.$updatePlot)
+   .$priorprob = gedit("",width=5)
+   .$handler.ID['changePriorProb'] = addhandlerchanged(.$priorprob,.$updatePlot)
+   .$model = gedit("",width=15)
+   .$handler.ID['changeModel'] = addhandlerchanged(.$model,.$updatePlot)
+   
    .$bf = glabel("")
+   .$bartlett = glabel("")
    .$possible = glabel("")
    .$postprob = glabel("")
    .$testAll = gcheckbox(.$translate("Test all"),checked=FALSE,handler=.$onTestAll)
@@ -48,26 +52,28 @@
 
     add(group,tmp <- gframe(.$translate("Hypothesis test")))
     testGroup = glayout(container=tmp)
-    testGroup[2,2,anchor=c(-1,0)] = glabel(.$translate("Possible models"))
-    testGroup[2,3] = .$possible
-    testGroup[3,2,anchor=c(-1,0)] = glabel(.$translate("Target model"))
-    testGroup[3,3] = .$model
-    testGroup[4,2,anchor=c(-1,0)] = glabel(.$translate("Prior Pr(M)"))
-    testGroup[4,3] =.$priorprob
-    testGroup[5,2] =.$testAll
-    testGroup[5,3] =.$doBMA
-    testGroup[6,2] = glabel(.$translate("Best model"))
-    testGroup[6,3] =.$bestOne
-    testGroup[7,2] = glabel(.$translate("BIC"))
-    testGroup[7,3] =.$bf
-    testGroup[8,2] = glabel(.$translate("Pr(M|D)"))
-    testGroup[8,3] =.$postprob
-    testGroup[9,1] = ""
+    testGroup[2,2,anchor=c(-1,0)] = glabel(.$translate("Homogeneity of variances"))
+    testGroup[2,3] = .$bartlett
+    testGroup[3,2,anchor=c(-1,0)] = glabel(.$translate("Possible models"))
+    testGroup[3,3] = .$possible
+    testGroup[4,2,anchor=c(-1,0)] = glabel(.$translate("Target model"))
+    testGroup[4,3] = .$model
+    testGroup[5,2,anchor=c(-1,0)] = glabel(.$translate("Prior Pr(M)"))
+    testGroup[5,3] =.$priorprob
+    testGroup[6,2] =.$testAll
+    testGroup[6,3] =.$doBMA
+    testGroup[7,2] = glabel(.$translate("Best model"))
+    testGroup[7,3] =.$bestOne
+    testGroup[8,2] = glabel(.$translate("BIC"))
+    testGroup[8,3] =.$bf
+    testGroup[9,2] = glabel(.$translate("Pr(M|D)"))
+    testGroup[9,3] =.$postprob
+    testGroup[10,1] = ""
     visible(testGroup)=TRUE
 
     add(group, tmp <- gframe(.$translate("Model posterior estimates")),expand=TRUE)
     est.tab = cbind(Group=rep("",10),Means=rep("",10),Inf95=rep("",10),Sup95=rep("",10))
-    names(est.tab) = .$translate(names(est.tab))
+    colnames(est.tab) = .$translate(colnames(est.tab))
     add(tmp,.$postestim <- gtable(est.tab),expand=TRUE)
 
     buttonGroup = ggroup(container=group)
@@ -77,10 +83,17 @@
   },
   onTestAll = function(.,h,...) {
   
-    if(svalue(.$testAll)) { enabled(.$model) = FALSE ; enabled(.$priorprob) = FALSE }
-    else                  { enabled(.$model) = TRUE  ; enabled(.$priorprob) = TRUE ; enabled(.$doBMA) = FALSE }
-    svalue(.$model) = ""
-    
+    if(svalue(.$testAll)) { 
+  
+      enabled(.$model)     = FALSE
+      enabled(.$priorprob) = FALSE
+    }
+    else { 
+      enabled(.$model)     = TRUE
+      enabled(.$priorprob) = TRUE
+      enabled(.$doBMA)     = FALSE
+    }
+    svalue(.$priorprob)  = ""
   },
   updatePlot = function(.,h,...) {
 
@@ -92,7 +105,7 @@
       return()
     }
     
-    # Vérification des données
+    # Any data provided?
     if(any(is.na(c(svalue(.$means),svalue(.$sds))))) {
       gmessage(.$translate("Please specify observed data."))
       return()
@@ -110,15 +123,24 @@
       gmessage(.$translate("Please specify at least two groups.\nMake sure there are as many values in all three fields."))
       return()
     }
-    
-    # Number of groups
+        
+    # Number of groups and observations
     K = length(mn)
+    No = sum(N)
+
+    # Bartlett test for homogeneity of variances
+    S2 = sd^2
+    Sp2 = sum((N-1)*S2)/(No-K)
+    A = (No-K)*log(Sp2) - sum((N-1)*log(S2))
+    B = 1+(sum(1/(N-1))-(1/(No-K)))/(3*(K-1))
+    K2 = A/B
+    svalue(.$bartlett) = paste("K2=",round(K2,3),"p<",round(1-pchisq(K2,K-1),4))
 
     # Default model is the saturated one
     if(!nchar(svalue(.$model))) {
+      blockhandler(.$model,.$handler.ID['changeModel'])
       svalue(.$model) = paste(1:length(mn),collapse=" ")
-      # Return or the analysis is performed twice!
-      return()
+      unblockhandler(.$model,.$handler.ID['changeModel'])
     }
 
     # Check model definition
@@ -139,33 +161,32 @@
 
     # Get model prior prob
     priorprob = eval(parse(text=svalue(.$priorprob)))
-    if(is.null(priorprob)) {
-      svalue(.$priorprob) = paste("1/",nmodels,sep="")
-      # Return or the analysis is performed twice!
-      return()
-    }
-
     m0   = .$testModel(mn,sd,N,rep(1,K))
     msat = .$testModel(mn,sd,N,1:K)
 
     if(svalue(.$testAll)) {
     
+      # Actually not used by BIC approx. but just for displaying
+      blockhandler(.$priorprob,.$handler.ID['changePriorProb'])
+      svalue(.$priorprob) = paste("1/",nmodels,sep="")
+      unblockhandler(.$priorprob,.$handler.ID['changePriorProb'])
+
       # Compute all possible models
       results = matrix(0,0,3*K)
       modProbs = vector()
       for(i in 1:ncol(models)) {
         test = .$testModel(mn,sd,N,models[,i])
         results = rbind(results,c(test$means,test$IC.inf,test$IC.sup))
-        modProbs = c(modProbs,test$prob)
+        modProbs = c(modProbs,test$bic)
         rownames(results)[i] = test$name
       }
       colnames(results) = c(paste("m",1:K,sep=""),paste("Inf",1:K,sep=""),paste("Sup",1:K,sep=""))
 
-      # Compute approximate Bayes factors
-      bfs = modProbs/m0$prob
-      
-      # Compute model posterior probs
-      modProbs = modProbs/sum(modProbs)
+      # Compute approximate Bayes factors and model posterior probs
+      modProbs = exp(-0.5*(modProbs - modProbs[1]))
+      bfs = modProbs
+      modProbs = modProbs / sum(modProbs)
+      # bfs = modProbs/m0$prob
       
       # Bayesian Model Averaging
       if(svalue(.$doBMA)) {
@@ -198,10 +219,17 @@
     # Theoretical model
     else {
     
+      # Get prior prob. on the target model
+      if(is.null(priorprob)) {
+        blockhandler(.$priorprob,.$handler.ID['changePriorProb'])
+        svalue(.$priorprob) = "1/2"
+        unblockhandler(.$priorprob,.$handler.ID['changePriorProb'])
+        priorprob = 1/2
+      }
       target = .$testModel(mn,sd,N,m)
 
       # Compute posterior prob
-      target.bf = target$prob/m0$prob
+      target.bf = exp(-.5*(target$bic-m0$bic))
       post.prob = priorprob * target.bf/(priorprob * target.bf + 1 - priorprob)
       
       svalue(.$bf) = paste(round(target$bic,4))
@@ -280,6 +308,7 @@
   #---------------------------------------------------------------------------------------
   #  SLOT                   INITIAL VALUE                                    CONTENT
   #---------------------------------------------------------------------------------------
+  handler.ID   = list(),               # IDs of various handlers that may have to be blocked
   means        =  NULL,                #
   sds          =  NULL,                #
   Ntot         =  NULL,                #

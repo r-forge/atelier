@@ -19,14 +19,19 @@
     
     # Don't create if already opened
     if(.$translate("Bayesian inference\non a contingency table") %in% names(.ws$nb)) return()
-    add(.ws$nb,group <- ggroup(horizontal=FALSE),label=.$translate("Bayesian inference\non a contingency table"))
+    group <- ggroup(horizontal=FALSE,cont=.ws$nb,label=.$translate("Bayesian inference\non a contingency table"))
     
-    add(group,tmp <- gframe(.$translate("Observed data"),expand=TRUE))
-    add(tmp, .$counts <- gtext(""),expand=TRUE,font.attr=c(family="monospace"))
+    tmp <- gframe(.$translate("Observed data"),cont=group,expand=TRUE)
+   .$counts <- gtext("",cont=tmp,expand=TRUE,font.attr=c(family="monospace"))
 
    .$alpha = gedit("1",width=3,coerce.with=as.numeric,handler=.$compute)
-   .$priorprob = gedit("",width=5,handler=.$compute)
-   .$model = gedit("",width=15,handler=.$compute)
+
+   .$priorprob = gedit("",width=5)
+   .$handler.ID['changePriorProb'] = addhandlerchanged(.$priorprob,.$compute)
+
+   .$model = gedit("",width=15)
+   .$handler.ID['changeModel'] = addhandlerchanged(.$model,.$compute)
+
    .$bf = glabel("")
    .$possible = glabel("")
    .$postprob = glabel("")
@@ -53,7 +58,7 @@
     testGroup[10,1] = ""
     visible(testGroup)=TRUE
 
-    add(group, tmp <- gframe(.$translate("Posterior estimates")),expand=TRUE)
+    add(group, tmp <- gframe(.$translate("Model posterior estimates")),expand=TRUE)
     add(tmp, .$estimNb <- gnotebook(), expand=TRUE)
     add(.$estimNb, tmp <- ggroup(),label=.$translate("Model"),expand=TRUE)
     add(tmp,.$postestim <- gtext("",font.attr=c(family="monospace")),expand=TRUE)
@@ -72,14 +77,14 @@
   },
   compute = function(.,h,...) {
 
-    # Vérification des paramètres
+    # Check parameters
     if(is.na(svalue(.$alpha))) {
       gmessage(.$translate("Please specify a parameter value for the Dirichlet prior."))
       return()
     }
     a = svalue(.$alpha)
     
-    # Vérification des données
+    # Check data
    .$getData()
     if(is.null(.$n)) {
       gmessage(.$translate("Please specify observed data."))
@@ -97,11 +102,11 @@
       return()
     }
 
-    # Vérification du modèle
+    # Saturated model by default
     if(!nchar(svalue(.$model))) {
+      blockhandler(.$model,.$handler.ID['changeModel'])
       svalue(.$model) = paste(1:I,collapse=" ")
-      # Return or the analysis is performed twice!
-      return()
+      unblockhandler(.$model,.$handler.ID['changeModel'])
     }
     
     m = .$getModel()
@@ -110,20 +115,12 @@
       return()
     }
     
-    # Nombre de modèles possibles
+    # Number of possible models
     if(I==2) models = cbind(c(1,1),c(1,2))
     else     models = setparts(I)
     nmodels = ncol(models)
     svalue(.$possible) = paste(nmodels)
     
-    # Vérification de la proba a priori du modèle
-    priorprob = eval(parse(text=svalue(.$priorprob)))
-    if(is.null(priorprob)) {
-      svalue(.$priorprob) = paste("1/",nmodels,sep="")
-      # Return or the analysis is performed twice!
-      return()
-    }
-
    .ws$setStatus(.$translate("Estimation in progress..."))
     svalue(.$bestOne) = ""
 
@@ -131,16 +128,21 @@
    .$p0 = .$testModel(rep("1",I),a)$estimates
    .$ps = .$testModel(1:I,a)$estimates
 
-    # Bayesian test
+    # Test all models
     if(svalue(.$testAll)) {
     
-      # All possible models
+      # Equal prior probs in this case
+      blockhandler(.$priorprob,.$handler.ID['changePriorProb'])
+      svalue(.$priorprob) = paste("1/",nmodels,sep="")
+      unblockhandler(.$priorprob,.$handler.ID['changePriorProb'])
+      priorprob = 1/nmodels
+
      .$avestimates = matrix(0,nrow(.$n),ncol(.$n))
       group.names = paste(1:I)
       sum.bf = 0
       best.bf = -1
       best.model = ""
-      
+            
       for(i in 1:nmodels) {
         svalue(.$possible) = paste(i,"/",nmodels)
         Sys.sleep(.001)
@@ -161,19 +163,27 @@
       # Best model
       svalue(.$bf) = round(best.bf,4)
       svalue(.$bestOne) = best.model
-      post.prob = priorprob * best.bf/(priorprob * best.bf + 1 - priorprob)
+      post.prob = best.bf/sum.bf
       svalue(.$postprob) = round(post.prob,4)
      .$groups = models[,best.model.index]
       
       # Estimates
-      svalue(.$postestim) = ""
-      insert(.$postestim,capture.output(round(.$p1,3)),font.attr=c(family="mono"))
-      svalue(.$avestim) = ""
-      insert(.$avestim,capture.output(round(.$avestimates,3)),font.attr=c(family="mono"))
-
-    }
+      svalue(.$postestim) = capture.output(round(.$p1,3))
+      svalue(.$avestim)   = capture.output(round(.$avestimates,3))
+    } 
+    
+    # Test a target model against the null
     else {
 
+      # Check prior prob on the target model
+      priorprob = eval(parse(text=svalue(.$priorprob)))
+      if(is.null(priorprob)) {
+        blockhandler(.$priorprob,.$handler.ID['changePriorProb'])
+        svalue(.$priorprob) = "1/2"
+        unblockhandler(.$priorprob,.$handler.ID['changePriorProb'])
+        priorprob = .5
+      }
+      
       # Convert model symbols in integers if letters were supplied
       if(all(m %in% letters)) m = match(tolower(m),letters)
     
@@ -187,10 +197,8 @@
       # A posteriori model averaged estimations
      .$p1 = test$estimates
      .$avestimates = post.prob*.$p1 + (1-post.prob)*.$p0
-      svalue(.$postestim) = ""
-      insert(.$postestim,capture.output(round(.$p1,3)))
-      svalue(.$avestim) = ""
-      insert(.$avestim,capture.output(round(.$avestimates,3)))
+      svalue(.$postestim) = capture.output(round(.$p1,3))
+      svalue(.$avestim)   = capture.output(round(.$avestimates,3))
     }
     
    .$updatePlot(h,...)
@@ -199,7 +207,7 @@
   },
   
   updatePlot = function(.,h,...) {
-  
+      
     # Graphique de base : modèle homogène
     C = ncol(.$n)
     responses = paste(1:C)
@@ -253,12 +261,12 @@
 
   testModel = function(.,mod,a) {
   
-    stopifnot(is.matrix(n))
+    stopifnot(is.matrix(.$n))
     
-    C  = ncol(n)
-    Kj = colSums(n)
-    n2 = rowsum(n,mod)
-    A  = matrix(a,nrow(n),ncol(n))
+    C  = ncol(.$n)
+    Kj = colSums(.$n)
+    n2 = rowsum(.$n,mod)
+    A  = matrix(a,nrow(.$n),ncol(.$n))
     A2 = matrix(a,nrow(n2),ncol(n2))
     
     lBeta = function(z)     rowSums(lgamma(z)) - lgamma(rowSums(z))
@@ -287,6 +295,7 @@
   #---------------------------------------------------------------------------------------
   #  SLOT                   INITIAL VALUE                                    CONTENT
   #---------------------------------------------------------------------------------------
+  handler.ID   = list(),               # IDs of various handlers that may have to be blocked
   alpha        =  NULL,                #
   counts       =  NULL,                #
   n            =  NULL,                #

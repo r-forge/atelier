@@ -277,9 +277,11 @@
       
       # Check parameter values
       if(distrib==.$translate("Student")) {
-        stopifnot(isInteger(param1)) }
+        stopifnot(param1>0)
+      }
       if(distrib==.$translate("Chi-2")) {
-        stopifnot(isInteger(param1)) }
+        stopifnot(param1>0) 
+      }
       
       # Prob. to quantile
       if(p) {
